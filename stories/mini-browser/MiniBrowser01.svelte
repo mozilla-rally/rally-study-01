@@ -1,10 +1,11 @@
 <script>
-	import { onMount, setContext } from 'svelte';
-	import { tweened } from 'svelte/motion';
+	import { onMount, onDestroy, setContext } from 'svelte';
 	import { get } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import mouseCoords from '../../src/app/components/mini-browser/mouse-coords';
 	import TabManager from '../../src/app/components/mini-browser/tab-manager';
+	import timer from '../../src/app/components/mini-browser/timer'
+
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
 	import MiniBrowser from '../../src/app/components/mini-browser/MiniBrowser.svelte';
 	import Tab from '../../src/app/components/mini-browser/Tab.svelte';
@@ -21,39 +22,38 @@
 	
 	const CURSOR_TIME = 500;
 	const EVENT_TRANSITION = 150;
-	setContext('CURSOR_TIIME', CURSOR_TIME);
+	setContext('CURSOR_TIME', CURSOR_TIME);
 	setContext('EVENT_TRANSITION', EVENT_TRANSITION);
-
-
 
 	let tabs = [
 		{name: "search", id: 0, icon: Search, url: `<span></span> :// <span></span> . <span style="--w: 2;"></span> . <span style="--w:.75"></span>`, content: SearchBody},
 		{name: "social media", id: 1, icon: SocialMedia, url: `<span></span> :// <span></span> . <span style="--w: 2.3"></span> . <span style="--w:.75"></span> / <span style="--w:1"></span>`, content: SocialMediaBody},
 		{name: "news", id: 2, icon: News, url: `<span></span> :// <span></span> . <span style="--w: 1.8;"></span> . <span style="--w:.75"></span> / <span style="--w:1.2"></span> / <span style="--w:.7"></span> / <span style="--w:1.2"></span> ? <span style="--w:.8"></span> = <span style="--w:1.2"></span>`, content: NewsBody},
 	];
-	
-	let which = tabs[0];
 
 	const tm = new TabManager(tabs);
-
-	let timer;
+	let activeTab = tm.activeTab;
 	let events = [];
 
-	let elapsedTimer;
-	let ms = 0;
+	let runningAnimation;
+	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
+	let elapsed = timer();
+	
+	const unsubscribeElapsed = elapsed.subscribe(ms => {
+		if (events.length)  events[0].elapsed = ~~ms;
+	});
+	
+	onMount(() => {
+		tm.setActiveTab(0);
+		elapsed.restart();
+		setTabAnimation();
+	})
+	onDestroy(() => {
+		unsubscribeElapsed();
+		elapsed.stop();
+		clearTimeout(runningAnimation);
+	});
 
-	function startElapsedTimer() {
-		if (elapsedTimer) {
-			ms = 1000;
-			elapsed.set(0, { duration: 0 });
-			elapsed.set(ms);
-			clearInterval(elapsedTimer);
-		}
-		elapsedTimer = setInterval(() => {
-			ms += 1000;
-			elapsed.set(ms);
-		}, 1000)
-	};
 
 	function finishEvent() {
 		events.unshift({
@@ -65,42 +65,25 @@
 				events.pop();
 			}
 			events = events;
-			startElapsedTimer();
 	}
-
-	let elapsed = tweened(0, { duration: 1000 });
 	
-	elapsed.subscribe(ms => {
-		if (events.length)  events[0].elapsed = ~~ms;
-	});
-
-	startElapsedTimer();
-	
-	onMount(() => {
-		setActiveTab(0);
-		setTabAnimation();
-	})
-	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
-
-	let activeTab = tm.activeTab;
 	async function switchTabs(tabID) {
 		const nextTab = tm.getTab(tabID);
 		await coords.goToElement(nextTab.container);
 		await tm.setActiveTab(tabID);
-		// set timer?
 		await finishEvent();
+		elapsed.restart();
 		activeTab = tm.activeTab;
 	}
 
 	function setTabAnimation() {
-		setTimeout(() => {
+		runningAnimation = setTimeout(() => {
 			if (tm.activeTab.id === 0) {
-
 				switchTabs(2);
 			} else {
-				switchTabs(0	);
+				switchTabs(0);
 			}
-			setTab();
+			setTabAnimation();
 		}, CURSOR_TIME * 4 + Math.random());
 	}
 
@@ -120,8 +103,8 @@
 			<div style='display:contents;' slot='tabs'>
 				{#each tm.tabs as tab (tab.id)}
 					<Tab active={activeTab.id === tab.id} 
-							on:click={() => setActiveTab(tab.id)}
-							on:close={() => closeTab(tab.id)}
+							on:click={() => tm.setActiveTab(tab.id)}
+							on:close={() => tm.closeTab(tab.id)}
 							bind:container={tab.container}
 					>
 						<div slot=icon style='display: contents;'>
