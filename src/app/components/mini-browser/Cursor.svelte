@@ -10,10 +10,10 @@ const duration = getContext('CURSOR_TIME');
 
 const params = { duration, easing: cubicInOut };
 
-let innerX = tweened(x, params);
-let innerY = tweened(y, params);
-$: innerX.set(x);
-$: innerY.set(y);
+// let innerX = tweened(x, params);
+// let innerY = tweened(y, params);
+// $: innerX.set(x);
+// $: innerY.set(y);
 </script>
 
 <style>
@@ -25,4 +25,4 @@ div {
 
 
 
-<div style="left: {$innerX}px; top: {$innerY}px;"><CursorIcon /></div>
+<div style="left: {x}px; top: {y}px;"><CursorIcon /></div>

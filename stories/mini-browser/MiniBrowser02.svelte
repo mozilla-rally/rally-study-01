@@ -1,6 +1,8 @@
 <script>
 	import { onMount, setContext } from 'svelte';
 	import { tweened } from 'svelte/motion';
+	import { cubicInOut } from 'svelte/easing';
+
 	import { get } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
@@ -103,15 +105,15 @@
         //setTab();
         closeTabs();
 	})
-    let coords = {x: 300, y: 300};
+
+	let coords = tweened({x: 300, y: 300}, { easing: cubicInOut });
 
 	function setCoords(tab) {
 		if (tab) {
-			coords = tab.getBoundingClientRect();
-			coords.x = (coords.left + coords.right) / 2;
-			coords.y = (coords.bottom + coords.top) / 2;
+			const rect = tab.getBoundingClientRect();
+			coords.set({x: (rect.left + rect.right) / 2, y: (rect.bottom + rect.top) / 2});
 		}
-    }
+	}
     
     function closeTabs() {
         setTimeout(() => {
@@ -170,7 +172,7 @@
 				{/if}
 			</div>
 			<div slot="cursor">
-				<Cursor x={coords.x} y={coords.y} />
+				<Cursor x={$coords.x} y={$coords.y} />
 			</div>
 		</MiniBrowser>
 

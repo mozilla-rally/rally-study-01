@@ -1,8 +1,10 @@
 <script>
 	import { onMount, setContext } from 'svelte';
 	import { tweened } from 'svelte/motion';
+	import { cubicInOut } from 'svelte/easing';
 	import { get } from 'svelte/store';
 	import { flip } from 'svelte/animate';
+	import mouseCoords from '../../src/app/components/mini-browser/mouse-coords';
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
 	import MiniBrowser from '../../src/app/components/mini-browser/MiniBrowser.svelte';
 	import Tab from '../../src/app/components/mini-browser/Tab.svelte';
@@ -35,7 +37,7 @@
 	function setActiveTab(w) {
 		// move the mouse
 		const nextTab = tabs.find(t=> t.id === w);
-		setCoords(nextTab.container);
+		coords.goToElement(nextTab.container);
 		// clear any timer.
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(() => { 
@@ -98,15 +100,7 @@
 		setActiveTab(0);
 		setTab();
 	})
-	let coords = {x: 300, y: 300};
-
-	function setCoords(tab) {
-		if (tab) {
-			coords = tab.getBoundingClientRect();
-			coords.x = (coords.left + coords.right) / 2;
-			coords.y = (coords.bottom + coords.top) / 2;
-		}
-	}
+	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
 
 	function setTab() {
 		setTimeout(() => {
@@ -158,7 +152,7 @@
 				{/if}
 			</div>
 			<div slot="cursor">
-				<Cursor x={coords.x} y={coords.y} />
+				<Cursor x={$coords.x} y={$coords.y} />
 			</div>
 		</MiniBrowser>
 
