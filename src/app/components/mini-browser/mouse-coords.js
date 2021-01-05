@@ -13,7 +13,7 @@ export default function mouseCoords(x, y, p = {}) {
     coords.goTo = (x, y, p = { easing: cubicInOut }) => {
         const params = Object.assign({}, systemParams, p);
         coords.set({x, y}, params);
-        return delay(params.t);
+        return delay(params.duration);
     }
     coords.goToElement = (element, p = {}) => {
         const params = Object.assign({}, systemParams, p);

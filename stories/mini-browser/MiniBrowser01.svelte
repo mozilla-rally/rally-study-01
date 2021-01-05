@@ -1,10 +1,10 @@
 <script>
 	import { onMount, setContext } from 'svelte';
 	import { tweened } from 'svelte/motion';
-	import { cubicInOut } from 'svelte/easing';
 	import { get } from 'svelte/store';
 	import { flip } from 'svelte/animate';
 	import mouseCoords from '../../src/app/components/mini-browser/mouse-coords';
+	import TabManager from '../../src/app/components/mini-browser/tab-manager';
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
 	import MiniBrowser from '../../src/app/components/mini-browser/MiniBrowser.svelte';
 	import Tab from '../../src/app/components/mini-browser/Tab.svelte';
@@ -24,6 +24,8 @@
 	setContext('CURSOR_TIIME', CURSOR_TIME);
 	setContext('EVENT_TRANSITION', EVENT_TRANSITION);
 
+
+
 	let tabs = [
 		{name: "search", id: 0, icon: Search, url: `<span></span> :// <span></span> . <span style="--w: 2;"></span> . <span style="--w:.75"></span>`, content: SearchBody},
 		{name: "social media", id: 1, icon: SocialMedia, url: `<span></span> :// <span></span> . <span style="--w: 2.3"></span> . <span style="--w:.75"></span> / <span style="--w:1"></span>`, content: SocialMediaBody},
@@ -31,30 +33,11 @@
 	];
 	
 	let which = tabs[0];
+
+	const tm = new TabManager(tabs);
+
 	let timer;
 	let events = [];
-	
-	function setActiveTab(w) {
-		// move the mouse
-		const nextTab = tabs.find(t=> t.id === w);
-		coords.goToElement(nextTab.container);
-		// clear any timer.
-		if (timer) clearTimeout(timer);
-		timer = setTimeout(() => { 
-			which = nextTab;
-			// add the next event.
-			events.unshift({
-				uri: which.url, 
-				elapsed: Math.round(get(elapsed) * 1000),
-				start: (new Date()).toISOString(),
-				id: Math.max(...events.map(e=> e.id), -1) + 1  });
-			if (events.length > 6) {
-				events.pop();
-			}
-			events = events;
-			startElapsedTimer();
-		}, CURSOR_TIME);
-	}
 
 	let elapsedTimer;
 	let ms = 0;
@@ -72,6 +55,19 @@
 		}, 1000)
 	};
 
+	function finishEvent() {
+		events.unshift({
+				uri: tm.activeTab.url, 
+				elapsed: Math.round(get(elapsed) * 1000),
+				start: (new Date()).toISOString(),
+				id: Math.max(...events.map(e=> e.id), -1) + 1  });
+			if (events.length > 6) {
+				events.pop();
+			}
+			events = events;
+			startElapsedTimer();
+	}
+
 	let elapsed = tweened(0, { duration: 1000 });
 	
 	elapsed.subscribe(ms => {
@@ -80,34 +76,29 @@
 
 	startElapsedTimer();
 	
-	function closeTab(tabID) {
-			if (which.id === tabID) {
-				const ind = tabs.findIndex(t=> t.id === tabID);
-				let nextIndex;
-				if (ind === tabs.length - 1) {
-					nextIndex = tabs.length - 1;
-				} else if (ind === 0) {
-					nextIndex = 1;
-				} else {
-					nextIndex = ind - 1;
-				}
-				setActiveTab(nextIndex);
-			}
-			tabs = tabs.filter(t => t.id !== tabID).map(t => ({...t}));
-	}
-
 	onMount(() => {
 		setActiveTab(0);
-		setTab();
+		setTabAnimation();
 	})
 	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
 
-	function setTab() {
+	let activeTab = tm.activeTab;
+	async function switchTabs(tabID) {
+		const nextTab = tm.getTab(tabID);
+		await coords.goToElement(nextTab.container);
+		await tm.setActiveTab(tabID);
+		// set timer?
+		await finishEvent();
+		activeTab = tm.activeTab;
+	}
+
+	function setTabAnimation() {
 		setTimeout(() => {
-			if (which.id === 0) {
-				setActiveTab(2);
+			if (tm.activeTab.id === 0) {
+
+				switchTabs(2);
 			} else {
-				setActiveTab(0);
+				switchTabs(0	);
 			}
 			setTab();
 		}, CURSOR_TIME * 4 + Math.random());
@@ -127,8 +118,8 @@
 	<div class='container'>
 		<MiniBrowser>
 			<div style='display:contents;' slot='tabs'>
-				{#each tabs as tab (tab.id)}
-					<Tab active={which.id===tab.id} 
+				{#each tm.tabs as tab (tab.id)}
+					<Tab active={activeTab.id === tab.id} 
 							on:click={() => setActiveTab(tab.id)}
 							on:close={() => closeTab(tab.id)}
 							bind:container={tab.container}
@@ -142,13 +133,13 @@
 				{/each}
 			</div>
 			<div style='display: contents;' slot='url'>
-				{#if which.url}
-					{@html which.url}
+				{#if tm.activeTab.url}
+					{@html tm.activeTab.url}
 				{/if}
 			</div>
 			<div style="display: contents;" slot='window'>
-				{#if which.content}
-					<svelte:component this={which.content} />
+				{#if tm.activeTab.content}
+					<svelte:component this={tm.activeTab.content} />
 				{/if}
 			</div>
 			<div slot="cursor">

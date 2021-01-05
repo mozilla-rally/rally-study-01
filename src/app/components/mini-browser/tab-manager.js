@@ -1,8 +1,12 @@
 export default class TabManager {
-    constructor(tabs) {
+    constructor(tabs, defaultTab = 0) {
         this._originalTabs = [...tabs.map(t=> ({...t}))];
         this.tabs = tabs;
-        this.activeTab = this.tabs[0];
+        this.activeTab = this.tabs[defaultTab];
+    }
+
+    getTab(id) {
+        return this.tabs.find(t=>t.id===id);
     }
 
     async setActiveTab(tabID) {
