@@ -66,7 +66,7 @@ import Search from '../../src/app/components/mini-browser/Search.svelte';
 }
 </style>
 
-<div class="site" in:fly={{duration: 200, y: 4}}>
+<div class="site" in:fly|local={{duration: 200, y: 4}}>
     <div class='header'>
         <div class="left-side" style="font-size: var(--sp5);"><Menu /> <Search /> </div>
         <div class="text" style="width: calc(var(--s1) * 4); background-color: var(--bg1);"></div>

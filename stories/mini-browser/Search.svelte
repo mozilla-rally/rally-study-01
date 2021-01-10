@@ -34,7 +34,7 @@
     }
 </style>
 
-<div in:fly={{duration: 200, y: 4}}>
+<div in:fly|local={{duration: 200, y: 4}}>
     <section class='header'>
     </section>
     <section class='search-bar'>

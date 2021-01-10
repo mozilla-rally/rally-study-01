@@ -1,11 +1,9 @@
 <script>
-	import { onMount, onDestroy, setContext, tick } from 'svelte';
+	import { onMount, onDestroy, setContext } from 'svelte';
 	import { get } from 'svelte/store';
-	import { flip } from 'svelte/animate';
 	import mouseCoords from '../../src/app/components/mini-browser/mouse-coords';
 	import TabManager from '../../src/app/components/mini-browser/tab-manager';
 	import timer from '../../src/app/components/mini-browser/timer'
-	import { delay } from './utils'
 
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
 	import MiniBrowser from '../../src/app/components/mini-browser/MiniBrowser.svelte';
@@ -13,13 +11,9 @@
 	import SocialMedia from '../../src/app/components/mini-browser/SocialMedia.svelte';
 	import Search from '../../src/app/components/mini-browser/Search.svelte';
 	import News from '../../src/app/components/mini-browser/News.svelte';
-	import Cursor from '../../src/app/components/mini-browser/Cursor.svelte';
 	import SearchBody from './Search.svelte';
 	import SocialMediaBody from './SocialMedia.svelte';
 	import NewsBody from './News.svelte';
-
-	import Event from '../../src/app/components/mini-browser/Event.svelte';
-	import EventContainer from '../../src/app/components/mini-browser/EventContainer.svelte';
 	
 	const CURSOR_TIME = 500;
 	const EVENT_TRANSITION = 150;
@@ -35,25 +29,10 @@
 	const tm = new TabManager(tabs);
 	let activeTab = tm.activeTab;
 	let events = [];
-
-	let runningAnimation;
-	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
-	let elapsed = timer();
-	
-	const unsubscribeElapsed = elapsed.subscribe(ms => {
-		if (events.length)  events[0].elapsed = ~~ms;
-	});
 	
 	onMount(() => {
-		tm.setActiveTab(0);
-		elapsed.restart();
-		setTabAnimation();
+        tm.setActiveTab(0);
 	})
-	onDestroy(() => {
-		unsubscribeElapsed();
-		elapsed.stop();
-		clearTimeout(runningAnimation);
-	});
 
 
 	function finishEvent() {
@@ -77,17 +56,15 @@
 		activeTab = tm.activeTab;
 	}
 
-	async function loop() {
-		await switchTabs(activeTab.id === 0 ? 2 : 0);
-		await delay(CURSOR_TIME * 3);
-		await tick();
-		activeTab = tm.activeTab;
-	}
-
-	async function setTabAnimation() {
-		await loop();
-		delay(CURSOR_TIME * 4 + Math.random());
-		setTabAnimation();
+	function setTabAnimation() {
+		runningAnimation = setTimeout(() => {
+			if (tm.activeTab.id === 0) {
+				switchTabs(2);
+			} else {
+				switchTabs(0);
+			}
+			setTabAnimation();
+		}, CURSOR_TIME * 4 + Math.random());
 	}
 
 </script>
@@ -106,8 +83,14 @@
 			<div style='display:contents;' slot='tabs'>
 				{#each tm.tabs as tab (tab.id)}
 					<Tab active={activeTab.id === tab.id} 
-							on:click={() => tm.setActiveTab(tab.id)}
-							on:close={() => tm.closeTab(tab.id)}
+							on:click={() => {
+                                tm.setActiveTab(tab.id);
+                                activeTab = tm.activeTab;
+                            }}
+							on:close={() => {
+                                tm.closeTab(tab.id);
+                                activeTab = tm.activeTab;
+                            }}
 							bind:container={tab.container}
 					>
 						<div slot=icon style='display: contents;'>
@@ -128,16 +111,5 @@
 					<svelte:component this={tm.activeTab.content} />
 				{/if}
 			</div>
-			<div slot="cursor">
-				<Cursor x={$coords.x} y={$coords.y} />
-			</div>
 		</MiniBrowser>
-
-	<EventContainer>
-		{#each events as event, i (event.id)}
-		<div animate:flip={{duration: EVENT_TRANSITION}}>
-			<Event end={i === event.length - 1} active={i === 0} elapsed={event.elapsed} uri={event.uri} start={event.start} />
-		</div>
-		{/each}
-	</EventContainer>
 </Container>

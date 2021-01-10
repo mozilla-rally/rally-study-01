@@ -1,10 +1,12 @@
 <script>
-	import { onMount, setContext } from 'svelte';
-	import { tweened } from 'svelte/motion';
-	import { cubicInOut } from 'svelte/easing';
-
+	import { onMount, onDestroy, setContext, tick } from 'svelte';
 	import { get } from 'svelte/store';
 	import { flip } from 'svelte/animate';
+	import mouseCoords from '../../src/app/components/mini-browser/mouse-coords';
+	import TabManager from '../../src/app/components/mini-browser/tab-manager';
+	import timer from '../../src/app/components/mini-browser/timer'
+	import { delay } from './utils'
+
 	import Container from '../../src/app/components/mini-browser/Container.svelte';
 	import MiniBrowser from '../../src/app/components/mini-browser/MiniBrowser.svelte';
 	import Tab from '../../src/app/components/mini-browser/Tab.svelte';
@@ -21,115 +23,90 @@
 	
 	const CURSOR_TIME = 500;
 	const EVENT_TRANSITION = 150;
-	setContext('CURSOR_TIIME', CURSOR_TIME);
+	setContext('CURSOR_TIME', CURSOR_TIME);
 	setContext('EVENT_TRANSITION', EVENT_TRANSITION);
 
 	let tabs = [
 		{name: "search", id: 0, icon: Search, url: `<span></span> :// <span></span> . <span style="--w: 2;"></span> . <span style="--w:.75"></span>`, content: SearchBody},
 		{name: "social media", id: 1, icon: SocialMedia, url: `<span></span> :// <span></span> . <span style="--w: 2.3"></span> . <span style="--w:.75"></span> / <span style="--w:1"></span>`, content: SocialMediaBody},
 		{name: "news", id: 2, icon: News, url: `<span></span> :// <span></span> . <span style="--w: 1.8;"></span> . <span style="--w:.75"></span> / <span style="--w:1.2"></span> / <span style="--w:.7"></span> / <span style="--w:1.2"></span> ? <span style="--w:.8"></span> = <span style="--w:1.2"></span>`, content: NewsBody},
-    ];
-    
-    let availableTabs = tabs;
-	
-	let which = tabs[0];
-	let timer;
-    let events = [];
-    
-    let key = Math.random();
-	
-	function setActiveTab(w, moveMouse = true) {
-		// move the mouse
-        const nextTab = tabs.find(t=> t.id === w);
-		if (moveMouse) setCoords(nextTab.container);
-		// clear any timer.
-		if (timer) clearTimeout(timer);
-		timer = setTimeout(() => { 
-			which = nextTab;
-			// add the next event.
-			events.unshift({
-				uri: which.url, 
-				elapsed: Math.round(get(elapsed) * 1000),
-				start: (new Date()).toISOString(),
-				id: Math.max(...events.map(e=> e.id), -1) + 1  });
-			if (events.length > 6) {
-				events.pop();
-			}
-			events = events;
-			startElapsedTimer();
-		}, moveMouse ? CURSOR_TIME : 0);
-	}
+	];
 
-	let elapsedTimer;
-	let ms = 0;
+	const tm = new TabManager(tabs);
+	let activeTab = tm.activeTab;
+	let events = [];
+	let key = Math.random();
 
-	function startElapsedTimer() {
-		if (elapsedTimer) {
-			ms = 1000;
-			elapsed.set(0, { duration: 0 });
-			elapsed.set(ms);
-			clearInterval(elapsedTimer);
-		}
-		elapsedTimer = setInterval(() => {
-			ms += 1000;
-			elapsed.set(ms);
-		}, 1000)
-	};
-
-	let elapsed = tweened(0, { duration: 1000 });
+	let runningAnimation;
+	const coords = mouseCoords(300, 300, { duration: CURSOR_TIME });
+	let elapsed = timer();
 	
-	elapsed.subscribe(ms => {
+	const unsubscribeElapsed = elapsed.subscribe(ms => {
 		if (events.length)  events[0].elapsed = ~~ms;
 	});
-
-	startElapsedTimer();
 	
-	function closeTab(tabID) {
-			if (which.id === tabID) {
-				const ind = availableTabs.findIndex(t=> t.id === tabID);
-				let nextIndex;
-				if (ind === tabs.length - 1) {
-					nextIndex = tabs.length - 1;
-				} else if (ind === 0) {
-					nextIndex = 1;
-				} else {
-					nextIndex = ind - 1;
-				}
-				setActiveTab(nextIndex, false);
-			}
-			availableTabs = availableTabs.filter(t => t.id !== tabID).map(t => ({...t}));
-	}
-
 	onMount(() => {
-		setActiveTab(1);
-        //setTab();
-        closeTabs();
+		tm.setActiveTab(0);
+		elapsed.restart();
+		setTabAnimation();
 	})
+	onDestroy(() => {
+		unsubscribeElapsed();
+		elapsed.stop();
+		clearTimeout(runningAnimation);
+	});
 
-	let coords = tweened({x: 300, y: 300}, { easing: cubicInOut });
 
-	function setCoords(tab) {
-		if (tab) {
-			const rect = tab.getBoundingClientRect();
-			coords.set({x: (rect.left + rect.right) / 2, y: (rect.bottom + rect.top) / 2});
+	function finishEvent() {
+		events.unshift({
+			uri: tm.activeTab.url, 
+			elapsed: Math.round(get(elapsed) * 1000),
+			start: (new Date()).toISOString(),
+			id: Math.max(...events.map(e=> e.id), -1) + 1  });
+		if (events.length > 6) {
+			events.pop();
 		}
+		events = events;
+		elapsed.restart();
 	}
-    
-    function closeTabs() {
-        setTimeout(() => {
-            if (availableTabs.length === 3) {
-                setCoords(which.close);
-                setTimeout(() => closeTab(which.id), CURSOR_TIME);
-            } else if (availableTabs.length === 2) {
-                events = [];
-                setActiveTab(1, false);
-                availableTabs = tabs;
-                key = Math.random();
-                coords = {x: 300, y: 300};
-            }
-            closeTabs();
-        }, CURSOR_TIME * 4 + Math.random());
-    }
+
+	async function clickTab(tabID) {
+		const nextTab = tm.getTab(tabID);
+		await coords.goToElement(nextTab.container);
+		await tick();
+		await tm.setActiveTab(tabID);
+		activeTab = tm.activeTab;
+		finishEvent();
+	}
+	
+	async function closeTab(tabID) {
+		const nextTab = tm.getTab(tabID);
+		await coords.goToElement(nextTab.close);
+		tm.closeTab(tabID);
+		finishEvent();
+		await tick();
+		activeTab = tm.activeTab;
+		await coords.goTo(300, 300);
+		await delay(600);
+	}
+
+	async function loop() {
+		await clickTab(2);
+		await delay(300);
+		await closeTab(2);
+		events = [];
+		tm.reset();
+		await tick();
+		await tm.setActiveTab(0);
+		activeTab = tm.activeTab;
+		key = Math.random();
+	}
+
+	async function setTabAnimation() {
+		await loop();
+		delay(CURSOR_TIME * 4 + Math.random());
+		setTabAnimation();
+	}
 
 </script>
 
@@ -146,10 +123,10 @@
 	<div class='container'>
 		<MiniBrowser>
 			<div style='display:contents;' slot='tabs'>
-				{#each availableTabs as tab (tab.id)}
-					<Tab active={which.id===tab.id} 
-							on:click={() => setActiveTab(tab.id)}
-							on:close={() => closeTab(tab.id)}
+				{#each tm.tabs as tab (tab.id)}
+					<Tab active={activeTab.id===tab.id} 
+							on:click={() => tm.setActiveTab(tab.id)}
+							on:close={() => tm.closeTab(tab.id)}
                             bind:container={tab.container}
                             bind:close={tab.close}
 					>
@@ -162,13 +139,13 @@
 				{/each}
 			</div>
 			<div style='display: contents;' slot='url'>
-				{#if which.url}
-					{@html which.url}
+				{#if activeTab.url}
+					{@html activeTab.url}
 				{/if}
 			</div>
 			<div style="display: contents;" slot='window'>
-				{#if which.content}
-					<svelte:component this={which.content} />
+				{#if activeTab.content}
+					<svelte:component this={activeTab.content} />
 				{/if}
 			</div>
 			<div slot="cursor">
