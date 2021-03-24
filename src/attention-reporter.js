@@ -1,8 +1,6 @@
 import browser from 'webextension-polyfill';
 
-import * as Events from "../WebScience/Utilities/Events.js"
-import * as Messaging from "../WebScience/Utilities/Messaging.js"
-import * as PageManager from "../WebScience/Utilities/PageManager.js"
+import { Events, PageManager, Messaging } from "@mozilla/web-science";
 
 /**
  * Additional information about the page data event.
@@ -152,7 +150,7 @@ export async function startMeasurement({
  * Stop a navigation measurement.
  */
 function stopMeasurement() {
-    Messaging.unregisterListener("WebScience.Measurements.PageNavigation.PageData", pageDataListener)
+    Messaging.unregisterListener("Measurements.PageNavigation.PageData", pageDataListener)
     registeredContentScript.unregister();
     registeredContentScript = null;
     notifyAboutPrivateWindows = false;
