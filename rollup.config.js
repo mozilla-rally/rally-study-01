@@ -6,7 +6,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 
- /**
+/**
   * Helper to detect developer mode.
   *
   * @param cliArgs the command line arguments.

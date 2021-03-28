@@ -10,13 +10,6 @@
  import { terser } from 'rollup-plugin-terser';
  import css from 'rollup-plugin-css-only';
  
-  /**
-   * Helper to detect developer mode.
-   *
-   * @param cliArgs the command line arguments.
-   * @return {Boolean} whether or not developer mode is enabled.
-   */
- 
    const production = !process.env.ROLLUP_WATCH;
    /**
    * Server.for the developer mode options page.
