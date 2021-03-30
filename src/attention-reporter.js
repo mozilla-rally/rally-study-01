@@ -30,8 +30,6 @@ import * as Events from "../WebScience/Utilities/Events.js"
 import * as Messaging from "../WebScience/Utilities/Messaging.js"
 import * as PageManager from "../WebScience/Utilities/PageManager.js"
 
-import SCHEMA from "../schemas/measurements.1.schema.json"
-
 /** 
  * The generic interface that defines the shared properties for `AttentionEvent` and `AudioEvent`.
  * @typedef {Object} UserEvent
@@ -54,18 +52,19 @@ import SCHEMA from "../schemas/measurements.1.schema.json"
 
 /** 
  * This web extension reports an attention event after the PageManager FIXME event is fired.
- * See [`UserEvent`](/RS01.module_attention-reporter-UserEvent.html) for additional properties.
+ * See {@link UserEvent} for additional properties.
  * @typedef {Object} AttentionEvent
  * 
  * @implements {UserEvent}
  * @property {number} MaxPixelScrollDepth - The largest reported pixel value on the active page the user has scrolled.
  * @property {number} maxRelativeScrollDepth - The largest reported proportion of the active page that has been scrolled already.
+ * @property {number} scrollHeight - The total scroll height of the page, taken from document.documentElement.scrollHeight.
  * @interface
  */
 
 /** 
  * This web extension reports an audio event after the Pagemanager FIXME event is fired.
- * See [`UserEvent`](/RS01.module_attention-reporter-UserEvent.html) for additional properties.
+ * See {@link UserEvent} for additional properties.
  * @typedef {Object} AudioEvent
  * 
  * @implements {UserEvent}
@@ -139,6 +138,9 @@ function pageDataListener(pageData) {
     onPageData.notifyListeners([ pageData ]);
 }
 
+/** the global schema object */
+let SCHEMA;
+
 /**
  * This function will start the attention measurement. 
  * It
@@ -154,6 +156,10 @@ export async function startMeasurement({
     privateWindows = false,
     schema
 }) {
+    if (!SCHEMA) {
+        SCHEMA = await fetch("../schemas/measurements.1.schema.json").then(r => r.json());
+    }
+
     await PageManager.initialize();
 
     notifyAboutPrivateWindows = privateWindows;
