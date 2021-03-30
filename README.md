@@ -58,7 +58,7 @@ This study *collects* two types of events:
 
 And it *submits* one kind of event, `RS01.event`. We collect as two events because of current limitations in WebScience's messaging schema validation. We don't have this limitation when submitting the final payload to the endpoint.
 
-The events submitted in this study are defined by the measurements schema, kept in `schema/`. All of the building & watching NPM commands in this repository will first generate this schema. To do it yourself and see all the fields collected by this study, run `npm run build:schema` and observe the results in `schema/measurements.1.schema.json`.
+The events submitted in this study are defined by the measurements schema, kept in `schema/measurements.*.schema.json`. All of the building & watching NPM commands in this repository will first generate this schema. To do it yourself and see all the fields collected by this study, run `npm run build:schema` and observe the results in `schema/measurements.*.schema.json`. This generated schema is what will be used to create the data tables and pipeline namespacing for this study.
 
 ## running this study locally to collect your own data and play with it
 
