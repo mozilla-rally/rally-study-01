@@ -5,6 +5,7 @@
 import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
+import json from '@rollup/plugin-json';
 
 /**
   * Helper to detect developer mode.
@@ -24,6 +25,7 @@ export default (cliArgs) => [
       sourcemap: isDevMode(cliArgs) ? "inline" : false,
     },
     plugins: [
+      json(),
       replace({
         // In Developer Mode, the study does not submit data and
         // gracefully handles communication errors with the Core

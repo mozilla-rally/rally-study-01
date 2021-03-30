@@ -26,30 +26,29 @@
  */
 
 import browser from 'webextension-polyfill';
-
 import * as Events from "../WebScience/Utilities/Events.js"
 import * as Messaging from "../WebScience/Utilities/Messaging.js"
 import * as PageManager from "../WebScience/Utilities/PageManager.js"
+
+import SCHEMA from "../schemas/measurements.1.schema.json"
 
 /** 
  * The generic interface that defines the shared properties for `AttentionEvent` and `AudioEvent`.
  * @typedef {Object} UserEvent
  * 
- * @property {number} pageId - The ID for the page, unique across browsing sessions.
- * @property {number} tabId - The ID for the tab containing the page, unique to the browsing session.
- * @property {number} windowId - The ID for the window containing the page, unique to the browsing session.
- * Note that tabs can subsequently move between windows.
- * @property {boolean} privateWindow - Whether the page is in a private window.
+ * @property {string} pageId - The ID for the page, unique across browsing sessions.
  * @property {string} url - The URL of the page loading in the tab, without any hash.
  * @property {string} referrer - The referrer URL for the page loading in the tab, or `""` if
  * there is no referrer.
  * @property {number} pageVisitStartTime - A unix timestamp (in miliseconds) when the page visit start event fired.
  * @property {number} pageVisitStopTime - A unix timestamp (in miliseconds) when the page visit stop event fired.
  * @property {number} duration - Time in miliseconds that the event lasted.
- * @property {string} reason - the reason the attention event was activated.
+ * @property {string} reason - the reason the attention event ended.
  * @property {string} title - the page's <title> contents, taken from the <head> tag.
  * @property {string} ogDescription - the page's og:description <meta> tag, taken from the <head> tag.
  * @property {string} ogType - the page's og:type <meta> tag, taken from the <head> tag.
+ * @property {number} eventStartTime - a unix timestamp in miliseconds specifying the start time of the event
+ * @property {number} eventStopTime - a unix timestamp in miliseconds specifying the stop time of the event
  * @interface
  */
 
@@ -70,8 +69,6 @@ import * as PageManager from "../WebScience/Utilities/PageManager.js"
  * @typedef {Object} AudioEvent
  * 
  * @implements {UserEvent}
- * @property {number} audioStartTime - A unix timestamp (in miliseconds) when the audio start event fired.
- * @property {number} audioEndTime - A unix timestamp (in miliseconds) when the audio start event fired.
  * @interface
  */
 
@@ -154,7 +151,8 @@ function pageDataListener(pageData) {
  */
 export async function startMeasurement({
     matchPatterns = [ ],
-    privateWindows = false
+    privateWindows = false,
+    schema
 }) {
     await PageManager.initialize();
 
@@ -168,39 +166,17 @@ export async function startMeasurement({
         runAt: "document_start"
     });
     /**
+     * Add listeners for each schema defined in the measurements schema.
      * @event
      */
-    Messaging.registerListener("RS01.attentionEvent", pageDataListener, {
-        pageId: "string",
-        url: "string",
-        referrer: "string",
-        pageVisitStartTime: "number",
-        pageVisitStopTime: "number",
-        duration: "number",
-        maxRelativeScrollDepth: "number",
-        maxPixelScrollDepth: "number",
-        privateWindow: "boolean",
-        reason: "string",
-        title: "string",
-        ogType: "string",
-        ogDescription: "string"
-    });
-
-    Messaging.registerListener("RS01.audioEvent", pageDataListener, {
-        pageId: "string",
-        url: "string",
-        referrer: "string",
-        pageVisitStartTime: "number",
-        pageVisitStopTime: "number",
-        duration: "number",
-        audioStartTime: "number",
-        audioEndTime: "number",
-        privateWindow: "boolean",
-        reason: "string",
-        title: "string",
-        ogType: "string",
-        ogDescription: "string"
-    });
+    SCHEMA.properties["RS01.userEvent"].oneOf.forEach(schema => {
+        const schemaProperties = Object.entries(schema.properties).reduce((acc,[k, v]) => {
+            acc[k] = v.type;
+            if (v.type === 'integer') acc[k] = "number";
+            return acc;
+        }, {});
+        Messaging.registerListener(schema.title, pageDataListener, schemaProperties);
+    })
 }
 
 /**
@@ -209,8 +185,11 @@ export async function startMeasurement({
  * 
  */
 export async function stopMeasurement() {
-    Messaging.unregisterListener("RS01.attentionEvent", pageDataListener);
-    Messaging.unregisterListener("RS01.audioEvent", pageDataListener);
+    if (SCHEMA) {
+        SCHEMA.properties["RS01.userEvent"].oneOf.forEach(schema => {
+            Messaging.unregisterListener(schema.title, pageDataListener);    
+        })
+    }
     registeredContentScript.unregister();
     registeredContentScript = null;
     notifyAboutPrivateWindows = false;

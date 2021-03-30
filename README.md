@@ -50,6 +50,20 @@ Below is a curated description of the important modules:
 - `src/event-stream-inspector.js` & `serc/event-stream-storage.js` – these modules are used in developer mode only. They enable the developer to examine which events are being collected and to export the collected data as a JSON file.
 - `src/app/` – the code for the frontend component of the options page that is made available in developer mode.
 
+## the event data collected by this study
+
+This study records two types of events:
+1. *attention events* (`RS01.attentionEvent`), defined by `web-science` as an active tab in an active window
+2. *audio events* (`RS01.audioEvent`), defined by `web-science` as an audio event playing on an active tab in an active window
+
+The events collected in this study are defined by the measurements schema, kept in `schema/`. All of the building & watching NPM commands in this repository will first generate this schema. To do it yourself and see all the fields collected by this study, run `npm run build:schema` and observe the results in `schema/measurements.1.schema.json`.
+
+If you want to add a new property to the `attentionEvent` or `audioEvent` events, You'll have to update in two places:
+1. add the field into `src/attention-collector.js` in the appropriate location
+2. add the field in the `attentionEventProperties` or `audioEventProperties` objects in `schemas/measurements.config.mjs`. If you want to add a new *shared* property, update `attentionEventProperties`.
+3. if you are running `npm run watch` already, you will have to run `npm run build:schema` and your dev browser will update.
+4. if you want to build the study, just run `npm run build` as you normally would and the changes will be applied.
+
 ## running this study locally to collect your own data and play with it
 
 1. fork or clone this repository

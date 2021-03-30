@@ -41,8 +41,8 @@ rally.initialize(
       if (__ENABLE_DEVELOPER_MODE__) {
         console.debug('output', data);
         await inspector.storage.push(data); 
-      } 
-      rally.sendPing("FIXME_ADD_PING_NAME_HERE", data);
+      }
+      rally.sendPing(data.eventType === 'attention' ? "RS01.attentionEvent" : "RS01.audioEvent", data);
   }, {
       matchPatterns: ["<all_urls>"],
       privateWindows: false
