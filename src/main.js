@@ -53,6 +53,7 @@ rally.initialize(
   }
 ).then(() => {
   // Initialize the event data collection and submission.
+  console.debug("~~~ RS01 running ~~~");
   collectEventDataAndSubmit();
   browser.browserAction.onClicked.addListener(openPage);
 }, reject => {
