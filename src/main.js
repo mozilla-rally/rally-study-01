@@ -1,11 +1,5 @@
 import { Rally, runStates } from "@mozilla/rally";
 import { onPageData, stopMeasurement } from "./attention-reporter";
-
-function openPage() {
-    browser.runtime.openOptionsPage().catch(e => {
-      console.error(`Study Add-On - Unable to open the control panel`, e);
-    });
-  }
   
 const rally = new Rally();
 
@@ -55,7 +49,6 @@ rally.initialize(
   // Initialize the event data collection and submission.
   console.debug("~~~ RS01 running ~~~");
   collectEventDataAndSubmit();
-  browser.browserAction.onClicked.addListener(openPage);
 }, reject => {
   // Do not start the study in this case. Something
   // went wrong.
