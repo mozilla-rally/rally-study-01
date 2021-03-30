@@ -28,48 +28,177 @@ We will use only the `debug` and `error` views here. These appear below the tras
 
 - open a new tab and go to `https://wikipedia.org`.
 - click on any link on the page to begin a new page visit. For instance, click on the `Wiktionary` link on the left below the fold.
-- in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload.
-  - the `eventTerminationReason` should be `page-visit-stop`.
-  - the `duration` should be comparable to the amount of time you spent on the page before you clicked on the `Wiktionary` link.
-  - the `eventType` should be `"attention"`
+- in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload that looks something like this:
 
+```javascript
+{
+  "pageId": "072f4a1edaf083911a04e5551ce14199",
+  "url": "https://www.wikipedia.org/",
+  "referrer": "",
+  "pageVisitStartTime": 1617135085021,
+  "pageVisitStopTime": 1617135086898,
+  "duration": 1609, // this value should be comparable to the time you spent on the page
+  "maxRelativeScrollDepth": 0,
+  "maxPixelScrollDepth": 0,
+  "scrollHeight": 0,
+  "eventTerminationReason": "page-visit-stop", // check that your value matches this
+  "title": "Wikipedia",
+  "ogType": "",
+  "description": "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.",
+  "eventStartTime": 1617135085289,
+  "eventStopTime": 1617135086898,
+  "eventType": "attention" // check that your value matches this
+}
+```
 ### b. test that switching tabs & closing tabs works
 
 - open a new tab and go to `https://wikipedia.org`.
 - open another tab and go to `https://youtube.com`.
 - switch back to the tab that has `https://wikipedia.org` loaded in it.
 - in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload.
-  - the `eventTerminationReason` should be `tab-switched-away`.
-  - the `duration` should be comparable to the amount of time you spent on the page before you switched back to the Wikipedia tab.
-  - the `eventType` should be `"attention"`.
-- now close the tab where Wikipedia was loaded. In the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload:
-  - the `eventTerminationReason` should be `page-visit-stop`.
-  - the `duration` should be comparable to the amount of time you spent on the Wikipedia page this time before closing it.
-  - the `eventType` should be `"attention"`.
-
+```javascript
+{
+  "pageId": "9341e4dc5d35d6ac26687193be2c6535",
+  "url": "https://www.youtube.com/",
+  "referrer": "",
+  "pageVisitStartTime": 1617135199869,
+  "pageVisitStopTime": 1617135206895,
+  "duration": 985, // this value should be comparable to the time you spent on the page before switching
+  "maxRelativeScrollDepth": 0,
+  "maxPixelScrollDepth": 0,
+  "scrollHeight": 0,
+  "eventTerminationReason": "tab-switched-away", // check that your value matches this
+  "title": "YouTube",
+  "ogType": "",
+  "description": "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.",
+  "eventStartTime": 1617135205910,
+  "eventStopTime": 1617135206895,
+  "eventType": "attention" // check that your value matches this
+}
+```
+- now close the tab where Wikipedia was loaded. In the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload that looks something like this:
+```javascript
+{
+  "pageId": "2e9109c1a64eb6615fa434f418ce6c77",
+  "url": "https://www.wiktionary.org/",
+  "referrer": "https://www.wikipedia.org/",
+  "pageVisitStartTime": 1617135086813,
+  "pageVisitStopTime": 1617135352548, 
+  "duration": 2569, // this value should be comparable to the time you spent on the page before closing
+  "maxRelativeScrollDepth": 0.5724815724815725,
+  "maxPixelScrollDepth": 932,
+  "scrollHeight": 1628,
+  "eventTerminationReason": "page-visit-stop", // check that your value matches this
+  "title": "Wiktionary",
+  "ogType": "",
+  "description": "",
+  "eventStartTime": 1617135349979,
+  "eventStopTime": 1617135352548,
+  "eventType": "attention" // check that your value matches this
+}
+```
 ### c. test that switching windows works
 
 - open a new tab and go to `https://wikipedia.org`
 - open a new window & tab, in in that new window / tab, go to `https://youtube.com`.
 - click back to the first window where the Wikipedia page is open.
 - in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload.
-  - the `eventTerminationReason` should be `window-focused-lost`
-  - the `duration` should be comparable to the amount of time you spent on the page before you switched back to the Wikipedia tab.
-  - the `eventType` should be `"attention"`
+
+```javascript
+{
+  "pageId": "f3d3f2d6f5a6f767ab0081d2d1f6dbcc",
+  "url": "https://www.youtube.com/",
+  "referrer": "",
+  "pageVisitStartTime": 1617135289520,
+  "pageVisitStopTime": 1617135296631,
+  "duration": 2523,  // this value should be comparable to the time you spent on the page before switching
+  "maxRelativeScrollDepth": 0,
+  "maxPixelScrollDepth": 0,
+  "scrollHeight": 0,
+  "eventTerminationReason": "window-focus-lost", // check that your value matches this
+  "title": "YouTube",
+  "ogType": "",
+  "description": "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.",
+  "eventStartTime": 1617135294108,
+  "eventStopTime": 1617135296631,
+  "eventType": "attention" // check that your value matches this
+}
+```
+### d. test that browser inactivity will end the attention event
+
+- open a new tab and go to `https://wikipedia.org`.
+- remove your hands from your keyboard and / or mouse, and wait around 15 seconds.
+- - in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload that should look like this:
+```javascript
+{
+  "pageId": "e196594a6aa7edb7843ae1561945e899",
+  "url": "https://www.wikipedia.org/",
+  "referrer": "",
+  "pageVisitStartTime": 1617135507676,
+  "pageVisitStopTime": 1617136469767,
+  "duration": 14938, // check that your value is close to 15000 or so
+  "maxRelativeScrollDepth": 0.8677839851024208,
+  "maxPixelScrollDepth": 932,
+  "scrollHeight": 1074,
+  "eventTerminationReason": "browser-idle", // check that your value matches this
+  "title": "Wikipedia",
+  "ogType": "",
+  "description": "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.",
+  "eventStartTime": 1617136454829,
+  "eventStopTime": 1617136469767,
+  "eventType": "attention" // check that your value matches this
+}
+```
 
 ## 2. testing the audio event collection
 
+Audio events behave somewhat like attention events, with a few special distinctions:
+- audio events and attention events and be concurrent. This is how WebScience has implemented the attention & audio model.
+- an audio event may still be active even if the attention event isn't.
+
+**NOTE**: audio events typically add around 3 seconds to the total `duration`. This is becuse the audio listener in WebScience is set to a cadence that waits a few seconds before sending the "end of audio" event.
 ### a. test that an audio event finishes when audio stops or tab is closed
 
 - open a new tab and go to `https://youtube.com`.
 - click on any video and make sure it is playing & that the audio in the player is not muted.
 - after a few seconds, stop the video.
-- in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload:
-  - the `eventTerminationReason` should be `audio-event-finished`
+- in the **Browser Console** you should see a debug log that starts with `RS01.event`, along with a data payload that looks like this:
+```javascript
+{
+  "pageId": "ef1884579be120fde262ec381fa8f78c",
+  "url": "https://www.youtube.com/watch?v=bQBDjEWyxis",
+  "referrer": "",
+  "pageVisitStartTime": 1617135411060,
+  "pageVisitStopTime": 1617135416384,
+  "duration": 4191, // check that this is comparable to about how long, plus a few seconds
+  "eventTerminationReason": "audio-event-finished", // check that your value matches this
+  "title": "【Demon Slayer | 귀멸의칼날】 Gurenge [LiSA] Cover by A-YEON - YouTube",
+  "ogType": "",
+  "description": "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.",
+  "eventStartTime": 1617135412193,
+  "eventStopTime": 1617135416384,
+  "eventType": "audio" // check that your value matches this
+}
+```
 - open another tab and to go `https://wikipedia.org`.
 - click back into the tab where the Youtube video was, and resume play.
 - while the video is playing, close the tab with the video.
 - After you close the tab, look in the **Browser Console** you should see two separate events that are very similar. Both start with `RS01.event`, along with a data payload.
-  - one event will have `eventType` set to `"attention"`. That's the end of the attention event.
-  - the other event that looks similar will have an `eventType` set to `"audio"`. That's the end of the audio event.
-  - the `eventTerminationReason` in both cases should be `page-visit-stop`.
+- here is the *audio event*:
+```javascript
+{
+  "pageId": "a19d10c5183f302f7579041384db1010",
+  "url": "https://www.youtube.com/watch?v=bQBDjEWyxis",
+  "referrer": "",
+  "pageVisitStartTime": 1617135504425,
+  "pageVisitStopTime": 1617135514919,
+  "duration": 3962, // check that this value is comparable to about how long the audio played, plus a few seconds
+  "eventTerminationReason": "page-visit-stop", // check that your value matches this
+  "title": "【Demon Slayer | 귀멸의칼날】 Gurenge [LiSA] Cover by A-YEON - YouTube",
+  "ogType": "video.other",
+  "description": "#DemonSlayer #鬼滅の刃 #귀멸의칼날Don't forget to click that red subscribe button and give me a thumbs up!!!!!!🥰🥰🥰구독과 좋아요 눌러주기!!💗💗💗😘😘😘● Instagram: https://in...",
+  "eventStartTime": 1617135510957,
+  "eventStopTime": 1617135514919,
+  "eventType": "audio" // check that your value matches this
+}
+```
