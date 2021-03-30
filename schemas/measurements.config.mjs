@@ -54,6 +54,13 @@ export const sharedEventProperties = {
       }
 }
 
+export const requiredEvents = [
+  // note that pageVisitStopTime is not a required field.
+  "eventType", "pageId", "url", "referrer", "pageVisitStartTime",
+  "duration", "eventStartTime", "eventStopTime", "eventTerminationReason",
+  "description", "title", "ogType"
+]
+
 export const attentionEventProperties = {
   "maxPixelScrollDepth": {
     "type": "integer",

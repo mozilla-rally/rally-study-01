@@ -138,9 +138,6 @@ function pageDataListener(pageData) {
     onPageData.notifyListeners([ pageData ]);
 }
 
-/** the global schema object */
-let SCHEMA;
-
 /**
  * This function will start the attention measurement. 
  * It
@@ -156,9 +153,6 @@ export async function startMeasurement({
     privateWindows = false,
     schema
 }) {
-    if (!SCHEMA) {
-        SCHEMA = await fetch("../schemas/measurements.1.schema.json").then(r => r.json());
-    }
 
     await PageManager.initialize();
 
@@ -171,18 +165,43 @@ export async function startMeasurement({
         }],
         runAt: "document_start"
     });
+
+    // Event properties that both of these event types consume.
+    const sharedEventProperties = {
+        pageId: "string",
+        url: "string",
+        referrer: "string",
+        eventType: "string",
+        pageVisitStartTime: "number",
+        pageVisitStopTime: "number",
+        eventStartTime: "number",
+        eventStopTime: "number",
+        duration: "number",
+        eventTerminationReason: "string",
+        title: "string",
+        ogType: "string",
+        description: "string",
+    }
+
     /**
      * Add listeners for each schema defined in the measurements schema.
+     * Because WebScience's messaging module does not support optional fields
+     * nor multiple field types, we will break out the attention collection from the audio collection.
+     * When we submit the event to the endpoint, however, we make no distinction between the two, utilizing
+     * the eventType property to distinguish the two cases.
+     * See https://github.com/mozilla-rally/web-science/issues/33 for more information.
      * @event
      */
-    SCHEMA.properties["RS01.userEvent"].oneOf.forEach(schema => {
-        const schemaProperties = Object.entries(schema.properties).reduce((acc,[k, v]) => {
-            acc[k] = v.type;
-            if (v.type === 'integer') acc[k] = "number";
-            return acc;
-        }, {});
-        Messaging.registerListener(schema.title, pageDataListener, schemaProperties);
-    })
+     Messaging.registerListener("RS01.attentionCollection", pageDataListener, {
+        ...sharedEventProperties,
+        maxRelativeScrollDepth: "number",
+        maxPixelScrollDepth: "number",
+        scrollHeight: "number",
+    });
+
+    Messaging.registerListener("RS01.audioCollection", pageDataListener, {
+        ...sharedEventProperties
+    });
 }
 
 /**
@@ -191,11 +210,8 @@ export async function startMeasurement({
  * 
  */
 export async function stopMeasurement() {
-    if (SCHEMA) {
-        SCHEMA.properties["RS01.userEvent"].oneOf.forEach(schema => {
-            Messaging.unregisterListener(schema.title, pageDataListener);    
-        })
-    }
+    Messaging.unregisterListener("RS01.attentionCollection", pageDataListener);    
+    Messaging.unregisterListener("RS01.audioCollection", pageDataListener);    
     registeredContentScript.unregister();
     registeredContentScript = null;
     notifyAboutPrivateWindows = false;

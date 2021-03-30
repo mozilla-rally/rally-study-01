@@ -155,7 +155,7 @@
 
         function sendAttentionData(timestamp, eventTerminationReason) {
             PageManager.sendMessage({ 
-                type: "RS01.attentionEvent",
+                type: "RS01.attentionCollection",
                 pageId: PageManager.pageId,
                 url: PageManager.url,
                 referrer: PageManager.referrer,
@@ -177,7 +177,7 @@
 
         function sendAudioData(timestamp, eventTerminationReason) {
             PageManager.sendMessage({ 
-                type: "RS01.audioEvent",
+                type: "RS01.audioCollection",
                 pageId: PageManager.pageId,
                 url: PageManager.url,
                 referrer: PageManager.referrer,
