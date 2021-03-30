@@ -52,17 +52,13 @@ Below is a curated description of the important modules:
 
 ## the event data collected by this study
 
-This study records two types of events:
-1. *attention events* (`RS01.attentionEvent`), defined by `web-science` as an active tab in an active window
-2. *audio events* (`RS01.audioEvent`), defined by `web-science` as an audio event playing on an active tab in an active window
+This study *collects* two types of events:
+1. *attention events* (`RS01.attentionCollection`), defined by `web-science` as an active tab in an active window
+2. *audio events* (`RS01.audioCollection`), defined by `web-science` as an audio event playing on an active tab in an active window
 
-The events collected in this study are defined by the measurements schema, kept in `schema/`. All of the building & watching NPM commands in this repository will first generate this schema. To do it yourself and see all the fields collected by this study, run `npm run build:schema` and observe the results in `schema/measurements.1.schema.json`.
+And it *submits* one kind of event, `RS01.event`. We collect as two events because of current limitations in WebScience's messaging schema validation. We don't have this limitation when submitting the final payload to the endpoint.
 
-If you want to add a new property to the `attentionEvent` or `audioEvent` events, You'll have to update in two places:
-1. add the field into `src/attention-collector.js` in the appropriate location
-2. add the field in the `attentionEventProperties` or `audioEventProperties` objects in `schemas/measurements.config.mjs`. If you want to add a new *shared* property, update `attentionEventProperties`.
-3. if you are running `npm run watch` already, you will have to run `npm run build:schema` and your dev browser will update.
-4. if you want to build the study, just run `npm run build` as you normally would and the changes will be applied.
+The events submitted in this study are defined by the measurements schema, kept in `schema/`. All of the building & watching NPM commands in this repository will first generate this schema. To do it yourself and see all the fields collected by this study, run `npm run build:schema` and observe the results in `schema/measurements.1.schema.json`.
 
 ## running this study locally to collect your own data and play with it
 
