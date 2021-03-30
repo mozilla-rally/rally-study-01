@@ -1,7 +1,30 @@
 import { Rally, runStates } from "@mozilla/rally";
-import { onPageData } from "./attention-reporter";
+import { onPageData, stopMeasurement } from "./attention-reporter";
+
+function openPage() {
+    browser.runtime.openOptionsPage().catch(e => {
+      console.error(`Study Add-On - Unable to open the control panel`, e);
+    });
+  }
   
 const rally = new Rally();
+
+function collectEventDataAndSubmit() {
+  // note: onPageData calls startMeasurement.
+  onPageData.addListener(async (data) => {
+    if (__ENABLE_DEVELOPER_MODE__) {
+      console.debug('RS01.event', data);
+    }
+    // though we collect the data as two different event types using Web Science,
+    // we send the payload using one schema, "RS01.event".
+    // Once https://github.com/mozilla-rally/web-science/issues/33 is resolved,
+    // we will change the collection schema (but keep this pipeline schema the same).
+    rally.sendPing("RS01.event", data);
+  }, {
+      matchPatterns: ["<all_urls>"],
+      privateWindows: false
+  });
+}
 
 rally.initialize(
   // A sample key id used for encrypting data.
@@ -19,25 +42,19 @@ rally.initialize(
   __ENABLE_DEVELOPER_MODE__,
   (newState) => {
     if (newState === runStates.RUNNING) {
+      // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
       console.debug("~~~ RS01 running ~~~");
+      collectEventDataAndSubmit();
     } else {
-      console.error("~~~ RS01 not running ~~~");
+      console.debug("~~~ RS01 not running ~~~");
+      // stop the measurement here.
+      stopMeasurement();
     }
   }
 ).then(() => {
-    onPageData.addListener(async (data) => {
-      if (__ENABLE_DEVELOPER_MODE__) {
-        console.debug('RS01.event', data);
-      }
-      // though we collect the data as two different event types using Web Science,
-      // we send the payload using one schema, "RS01.event".
-      // Once https://github.com/mozilla-rally/web-science/issues/33 is resolved,
-      // we will change the collection schema (but keep this pipeline schema the same).
-      rally.sendPing("RS01.event", data);
-  }, {
-      matchPatterns: ["<all_urls>"],
-      privateWindows: false
-  });
+  // Initialize the event data collection and submission.
+  collectEventDataAndSubmit();
+  browser.browserAction.onClicked.addListener(openPage);
 }, reject => {
   // Do not start the study in this case. Something
   // went wrong.
