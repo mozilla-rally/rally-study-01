@@ -108,6 +108,7 @@ function removeListener(listener) {
 
 /**
  * The registered page navigation content script.
+ * @private
  * @type {RegisteredContentScript|null}
  */
 let registeredContentScript = null;

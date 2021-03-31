@@ -18,7 +18,7 @@ jobs:
           name: Build the study
           command: npm run build
 
-  Addon code unit tests:
+  Study unit tests:
     docker:
       - image: cimg/node:14.13.1
     steps:
@@ -27,10 +27,10 @@ jobs:
           name: Install the dependencies
           command: npm install
       - run:
-          name: Build the study
+          name: Run the unit test
           command: npm run test:unit
 
-  Addon code linting:
+  Study linting:
     docker:
       - image: cimg/node:14.13.1
     steps:
@@ -51,5 +51,5 @@ workflows:
   ci:
     jobs:
       - Build
-      - Addon code linting
-      - Addon code unit tests
+      - Study linting
+      - Study unit tests
