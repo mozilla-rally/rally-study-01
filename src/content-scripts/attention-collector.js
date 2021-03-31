@@ -1,6 +1,15 @@
 /**
  * Content script attention-collector for RS01.
  *
+ * Responsible for thee collection of the `RS01.attentionEvent` and `RS01.audioEvent`, which is sent
+ * to attention-reporter.js.
+ * 
+ * This content script is organized as follow:
+ * - constants
+ * - DOM element collection functions
+ * - collection-sending functions
+ * - callbacks used in the PageManager events system
+ * 
  * ## Known Issues
  *   * When sending page data during a page visit stop event, sometimes
  *     Firefox generates an error ("Promise resolved while context is inactive")
@@ -8,37 +17,18 @@
  *     message sending Promise remains open. This error does not affect functionality,
  *     because we do not depend on resolving the Promise (i.e., a response to the
  *     page visit stop message).
+ * 
  * @module RS01.attention-collector
  */
+
 // Tell eslint that PageManager isn't actually undefined
 /* global PageManager */
 
 // Outer function encapsulation to maintain unique variable scope for each content script
 (function () {
-
-    function getContentsHavingSelector(str, documentElement) {
-        const e = documentElement.querySelector(str);
-        return e === null ? undefined : e.content || e.innerText;
-    }
-
-    function getTitle(documentElement) {
-        return getContentsHavingSelector('title', documentElement);
-    }
-    
-    function getOGType(documentElement) {
-        return getContentsHavingSelector('meta[property="og:type"]', documentElement);
-    }
-
-    function getOGDescription(documentElement) {
-        return getContentsHavingSelector('meta[property="og:description"]', documentElement);
-    }
-
-    function getMetaDescription(documentElement) {
-        return getContentsHavingSelector('meta[name="description"]', documentElement);
-    }
-
     // Inner function encapsulation to wait for PageManager load
-    const attentionCollector = function () {
+    const attentionCollector = function() {
+        // CONSTANTS
         /**
          * How long the page has had the user's attention.
          * @type {number}
@@ -113,7 +103,20 @@
          * include padding but not margin or border.
          * @type {number}
          */
+
         let maxRelativeScrollDepth = 0;
+        /** 
+         * The maximum absolute scroll depth in pixels, defined as the depth of the bottom of
+         * the content window.
+         * @type {number}
+         */
+        let maxPixelScrollDepth = 0;
+
+        /** 
+         * The total scroll height of the page.
+         * @type {number}
+         */
+        let scrollHeight = 0;
 
         /**
          * An interval timer ID for checking scroll depth.
@@ -139,19 +142,88 @@
          */
         let ogType = '';
 
-        let attentionStartTime;
-        let attentionStopTime;
-        let audioStartTime;
-        let audioStopTime;
-        let scrollHeight = 0;
-        let maxPixelScrollDepth = 0;
+        /** 
+         * The start time (unix timestamp in ms) the attention event started.
+         * @type {number}
+         */
+        let attentionStartTime = 0;
+        /** 
+         * The start time (unix timestamp in ms) the attention event stopped.
+         * @type {number}
+         */
+        let attentionStopTime = 0;
+        /** 
+         * The start time (unix timestamp in ms) the audio event started.
+         * @type {number}
+         */
+        let audioStartTime = 0;
+        /** 
+         * The start time (unix timestamp in ms) the audio event stopped.
+         * @type {number}
+         */
+        let audioStopTime = 0;
 
+        // DOM ELEMENT COLLECTION FUNCTIONS
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the content or innerText of the selected DOM element
+         */
+        function getContentsHavingSelector(str, documentElement) {
+            const e = documentElement.querySelector(str);
+            return e === null ? undefined : e.content || e.innerText;
+        }
+
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the content of the title element
+         */
+        function getTitle(documentElement) {
+            return getContentsHavingSelector('title', documentElement);
+        }
+        
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the content of the meta og:type tag
+         */
+        function getOGType(documentElement) {
+            return getContentsHavingSelector('meta[property="og:type"]', documentElement);
+        }
+
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the content of the meta og:description tag
+         */
+        function getOGDescription(documentElement) {
+            return getContentsHavingSelector('meta[property="og:description"]', documentElement);
+        }
+
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the content of the meta description tag
+         */
+        function getMetaDescription(documentElement) {
+            return getContentsHavingSelector('meta[name="description"]', documentElement);
+        }
+        /**
+         * Gather the measurements from the DOM.
+         */
         function getDOMElements() {
             title = getTitle(document) || '';
             ogDescription = getOGDescription(document) || getMetaDescription(document) || '';
             ogType = getOGType(document) || '';
         }
 
+        // COLLECTION-SENDING FUNCTIONS
+        /**
+         * Send the collected attention data through the RS01.attentionCollection message namespace.
+         * @param {number} timestamp unix timestamp used to note the pageVisitStopTime
+         * @param {string} eventTerminationReason the reason the event has ended
+         */
         function sendAttentionData(timestamp, eventTerminationReason) {
             PageManager.sendMessage({ 
                 type: "RS01.attentionCollection",
@@ -174,6 +246,11 @@
             });
         }
 
+        /**
+         * Send the collected attention data through the RS01.audioCollection message namespace.
+         * @param {number} timestamp unix timestamp used to note the pageVisitStopTime
+         * @param {string} eventTerminationReason the reason the event has ended
+         */
         function sendAudioData(timestamp, eventTerminationReason) {
             PageManager.sendMessage({ 
                 type: "RS01.audioCollection",
@@ -193,6 +270,11 @@
             });
         }
 
+        // CALLBACKS USED IN THE PAGEMANAGER EVENTS SYSTEM
+        /** 
+         * Callback for the PageManager.onPageVisitStart event
+         * @callback
+         */
         const pageVisitStart = function ({ timeStamp }) {
             // Reset page attention and page audio tracking
             attentionDuration = 0;
@@ -208,7 +290,7 @@
                    (!scrollDepthWaitForAttention || ((firstAttentionTime > 0) && ((Date.now() - firstAttentionTime) >= scrollDepthUpdateDelay))) &&
                    (document.documentElement.offsetHeight >= scrollDepthMinimumHeight)) {
                     
-                    scrollHeight = document.documentElement.scrollHeight
+                    scrollHeight = document.documentElement.scrollHeight;
 
                     maxPixelScrollDepth =
                         Math.min(scrollHeight,
@@ -221,35 +303,36 @@
             }, scrollDepthUpdateInterval);
         };
 
-        if(PageManager.pageVisitStarted) {
-            pageVisitStart({ timeStamp: PageManager.pageVisitStartTime });
-        }
-        PageManager.onPageVisitStart.addListener(pageVisitStart);
-
-        PageManager.onPageVisitStop.addListener(({ timeStamp }) => {
+        /** 
+         * Callback for the PageManager.onPageVisitStop event
+         * @callback
+         */
+        function onPageVisitStop({ timeStamp }) {
             // Update the attention and audio durations
             if(PageManager.pageHasAttention)
-                attentionDuration = timeStamp - lastAttentionUpdateTime;
+            attentionDuration = timeStamp - lastAttentionUpdateTime;
             if(PageManager.pageHasAudio)
-                audioDuration = timeStamp - lastAudioUpdateTime;
+            audioDuration = timeStamp - lastAudioUpdateTime;
 
             // Clear the interval timer for checking scroll depth
             clearInterval(scrollDepthIntervalId);
             if (PageManager.pageHasAttention) {
-                attentionStopTime = timeStamp;
-                audioStopTime = timeStamp;
-                // if the page had audio, it's time to send the audio data event.
-                if (PageManager.pageHasAudio) {
-                    sendAudioData(timeStamp, 'page-visit-stop');
-                } 
-                // always send an attention event.
-                sendAttentionData(timeStamp, 'page-visit-stop');
+            attentionStopTime = timeStamp;
+            audioStopTime = timeStamp;
+            // if the page had audio, it's time to send the audio data event.
+            if (PageManager.pageHasAudio) {
+                sendAudioData(timeStamp, 'page-visit-stop');
+            } 
+            // always send an attention event.
+            sendAttentionData(timeStamp, 'page-visit-stop');
             }
-        });
+        }
 
-        PageManager.onPageAttentionUpdate.addListener((etc) => {
-            const { timeStamp, reason } = etc;
-            // onAttentionStart
+        /** 
+         * Callback for the PageManager.onPageAttentionUpdate event.
+         * @callback
+         */
+        function onPageAttentionUpdate({timeStamp, reason}) {
             if(PageManager.pageHasAttention) {
                 attentionStartTime = timeStamp;
                 getDOMElements();
@@ -269,9 +352,13 @@
                 attentionStopTime = timeStamp;
                 sendAttentionData(timeStamp, reason);
             }
-        });
+        }
 
-        PageManager.onPageAudioUpdate.addListener(({ timeStamp }) => {
+        /** 
+         * Callback for the PageManager.onPageAudioUpdate event
+         * @callback
+         */
+        function onPageAudioUpdate({ timeStamp }) {
             if (PageManager.pageHasAudio) {
                 lastAudioUpdateTime = timeStamp;
                 audioStartTime = timeStamp;
@@ -282,7 +369,16 @@
                 sendAudioData(timeStamp, "audio-event-finished");
             }
             lastAudioUpdateTime = timeStamp;
-        });
+        }
+
+        // register all the required events here.
+        if (PageManager.pageVisitStarted) {
+            pageVisitStart({ timeStamp: PageManager.pageVisitStartTime });
+        }
+        PageManager.onPageVisitStart.addListener(pageVisitStart);
+        PageManager.onPageVisitStop.addListener(onPageVisitStop);
+        PageManager.onPageAttentionUpdate.addListener(onPageAttentionUpdate);
+        PageManager.onPageAudioUpdate.addListener(onPageAudioUpdate);
     };
 
     // Wait for PageManager load

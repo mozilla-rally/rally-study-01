@@ -179,7 +179,7 @@ export async function startMeasurement({
     }
 
     /**
-     * Add listeners for each schema defined in the measurements schema.
+     * Add listeners for each schema defined below.
      * Because WebScience's messaging module does not support optional fields
      * nor multiple field types, we will break out the attention collection from the audio collection.
      * When we submit the event to the endpoint, however, we make no distinction between the two, utilizing
@@ -202,7 +202,6 @@ export async function startMeasurement({
 /**
  * This function will stop the attention measurement. It unregisters the 
  * content script and all associated listeners.
- * 
  */
 export async function stopMeasurement() {
     Messaging.unregisterListener("RS01.attentionCollection", pageDataListener);    

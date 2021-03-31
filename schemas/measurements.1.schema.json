@@ -19,10 +19,7 @@
         "eventType": {
           "type": "string",
           "description": "the type of event this object represents",
-          "enum": [
-            "attention",
-            "audio"
-          ]
+          "enum": ["attention", "audio"]
         },
         "pageId": {
           "type": "string",
