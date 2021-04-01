@@ -6,8 +6,6 @@
  * @module WebScience.Utilities.Debugging
  */
 
-import browser from 'webextension-polyfill';
-
 /**
  * Create a debugging logger, a function that logs debugging events (as strings).
  * @param {string} moduleName - A name that uniquely identifies the module
@@ -18,10 +16,4 @@ export function getDebuggingLog(moduleName) {
     return ((text) => {
         console.debug("WebScience." + moduleName + ": " + text);
     });
-}
-
-export function getExtensionVersion() {
-    const manifest = browser.runtime.getManifest();
-    if ("version" in manifest) return manifest.version;
-    return "";
 }

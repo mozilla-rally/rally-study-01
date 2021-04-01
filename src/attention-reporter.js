@@ -86,7 +86,6 @@ import * as PageManager from "../WebScience/Utilities/PageManager.js"
 
 /**
  * Function to start measurement when a listener is added
- * TODO: deal with multiple listeners with different match patterns
  * @private
  * @param {EventCallbackFunction} listener - new listener being added
  * @param {PageDataOptions} options - configuration for the events to be sent to this listener
