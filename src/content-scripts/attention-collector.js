@@ -4,7 +4,7 @@
  * Responsible for thee collection of the `RS01.attentionEvent` and `RS01.audioEvent`, which is sent
  * to attention-reporter.js.
  * 
- * This content script is organized as follow:
+ * This content script is organized as follows:
  * - constants
  * - DOM element collection functions
  * - collection-sending functions
@@ -309,22 +309,25 @@
          */
         function onPageVisitStop({ timeStamp }) {
             // Update the attention and audio durations
-            if(PageManager.pageHasAttention)
-            attentionDuration = timeStamp - lastAttentionUpdateTime;
-            if(PageManager.pageHasAudio)
-            audioDuration = timeStamp - lastAudioUpdateTime;
-
+            if(PageManager.pageHasAttention) {
+                attentionDuration = timeStamp - lastAttentionUpdateTime;
+            }
+            if(PageManager.pageHasAudio) {
+                audioDuration = timeStamp - lastAudioUpdateTime;
+            }
+            
             // Clear the interval timer for checking scroll depth
             clearInterval(scrollDepthIntervalId);
             if (PageManager.pageHasAttention) {
-            attentionStopTime = timeStamp;
-            audioStopTime = timeStamp;
-            // if the page had audio, it's time to send the audio data event.
-            if (PageManager.pageHasAudio) {
-                sendAudioData(timeStamp, 'page-visit-stop');
-            } 
-            // always send an attention event.
-            sendAttentionData(timeStamp, 'page-visit-stop');
+                attentionStopTime = timeStamp;
+                audioStopTime = timeStamp;
+                // if the page had audio, it's time to send the audio data event.
+                if (PageManager.pageHasAudio) {
+                    sendAudioData(timeStamp, 'page-visit-stop');
+                } 
+                // always send an attention event regardless of whether an audio
+                // event is playing or not.
+                sendAttentionData(timeStamp, 'page-visit-stop');
             }
         }
 
@@ -339,9 +342,10 @@
             }
 
             // If the page just gained attention for the first time, store the time stamp
-            if(PageManager.pageHasAttention && (firstAttentionTime < PageManager.pageVisitStartTime))
+            if(PageManager.pageHasAttention && (firstAttentionTime < PageManager.pageVisitStartTime)) {
                 firstAttentionTime = timeStamp;
-
+            }
+            
             // If the page just lost attention, add to the attention duration
             // and possibly the attention and audio duration
             if(!PageManager.pageHasAttention) {
@@ -382,11 +386,12 @@
     };
 
     // Wait for PageManager load
-    if ("PageManager" in window)
+    if ("PageManager" in window) {
         attentionCollector();
-    else {
-        if(!("pageManagerHasLoaded" in window))
+    } else {
+        if(!("pageManagerHasLoaded" in window)) {
             window.pageManagerHasLoaded = [];
+        }
         window.pageManagerHasLoaded.push(attentionCollector);
     }
 
