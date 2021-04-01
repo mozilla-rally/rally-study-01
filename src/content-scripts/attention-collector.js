@@ -275,8 +275,7 @@
             if (PageManager.pageHasAudio) {
                 lastAudioUpdateTime = timeStamp;
                 audioStartTime = timeStamp;
-            }
-            if(!PageManager.pageHasAudio) {
+            } else {
                 audioDuration = timeStamp - lastAudioUpdateTime;
                 audioStopTime = timeStamp;
                 getDOMElements();
