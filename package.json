@@ -84,7 +84,7 @@
     "url": "git+https://github.com/mozilla-rally/rally-study-01.git"
   },
   "keywords": [],
-  "author": "Hamilton Ulmer",
+  "author": "Mozilla Rally",
   "license": "MPL-2.0",
   "private": true,
   "bugs": {

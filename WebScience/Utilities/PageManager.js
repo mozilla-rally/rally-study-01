@@ -417,7 +417,7 @@ export async function initialize() {
     Messaging.registerSchema("WebScience.Utilities.PageManager.pageAttentionUpdate", {
         timeStamp: "number",
         pageHasAttention: "boolean",
-        // HAMILTON: added inboundAttentionReason
+        // NOTE: added inboundAttentionReason
         reason: "string"
     });
 
