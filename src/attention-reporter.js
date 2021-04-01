@@ -129,8 +129,6 @@ function pageDataListener(pageData) {
         return;
 
     // Delete the type string from the content script message
-    // There isn't (yet) a good way to document this in JSDoc, because there isn't support
-    // for object inheritance
     delete pageData.type;
 
     onPageData.notifyListeners([ pageData ]);
