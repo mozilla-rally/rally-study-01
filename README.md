@@ -46,7 +46,7 @@ As of this writing, this repository uses a vendored version of `web-science`, co
 Below is a curated description of the important modules:
 
 - `src/main.js` - the main entrypoint for the study. Configures the Rally API, establishes the callback for page data, etc.
-- `src/attention-reporter.js` - the reporting module for the data collection. Registers the `src/attention-collector.js` content script and handles the starting and stopping of measurement.
+- `src/attention-reporter.js` - the reporting module for the data collection. Registers the `src/content-scripts/attention-collector.js` content script and handles the starting and stopping of measurement.
 
 ## the event data collected by this study
 

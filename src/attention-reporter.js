@@ -158,7 +158,7 @@ export async function startMeasurement({
     registeredContentScript = await browser.contentScripts.register({
         matches: matchPatterns,
         js: [{
-            file: "/src/attention-collector.js"
+            file: "/src/content-scripts/attention-collector.js"
         }],
         runAt: "document_start"
     });
