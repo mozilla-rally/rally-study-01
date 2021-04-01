@@ -51,7 +51,7 @@ import * as PageManager from "../WebScience/Utilities/PageManager.js"
  */
 
 /** 
- * This web extension reports an attention event after the PageManager FIXME event is fired.
+ * This web extension reports an attention event after the PageManager pageVisitStop and pageAttentionUpdate (when attention ends) events is fired.
  * See {@link UserEvent} for additional properties.
  * @typedef {Object} AttentionEvent
  * 
