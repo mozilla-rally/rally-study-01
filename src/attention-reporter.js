@@ -63,7 +63,7 @@ import * as PageManager from "../WebScience/Utilities/PageManager.js"
  */
 
 /** 
- * This web extension reports an audio event after the Pagemanager FIXME event is fired.
+ * This web extension reports an audio event after the PageManager pageAudioUpdate event (when page ceases to have audio) is fired.
  * See {@link UserEvent} for additional properties.
  * @typedef {Object} AudioEvent
  * 
