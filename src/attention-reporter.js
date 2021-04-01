@@ -74,7 +74,7 @@ import * as PageManager from "../WebScience/Utilities/PageManager.js"
 /**
  * A callback function for the page data event.
  * @callback pageDataCallback
- * @param {(AttentionEvent|AudioEvent)} details - FIXME.
+ * @param {(AttentionEvent|AudioEvent)} details
  */
 
 /**
