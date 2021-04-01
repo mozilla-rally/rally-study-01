@@ -222,8 +222,9 @@
             }, scrollDepthUpdateInterval);
         };
 
-        if(PageManager.pageVisitStarted)
+        if(PageManager.pageVisitStarted) {
             pageVisitStart({ timeStamp: PageManager.pageVisitStartTime });
+        }
         PageManager.onPageVisitStart.addListener(pageVisitStart);
 
         PageManager.onPageVisitStop.addListener(({ timeStamp }) => {
