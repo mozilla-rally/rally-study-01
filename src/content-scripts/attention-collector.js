@@ -121,7 +121,6 @@
          */
         let scrollDepthIntervalId = 0;
 
-        // HAMILTON: fields I have added are below
         /**
          * The title element contents of the page.
          * @type {string}
@@ -266,7 +265,6 @@
                 attentionDuration = timeStamp - lastAttentionUpdateTime;
             }
             lastAttentionUpdateTime = timeStamp;
-            // HAMILTON: send the event.
             if(!PageManager.pageHasAttention) {
                 attentionStopTime = timeStamp;
                 sendAttentionData(timeStamp, reason);
