@@ -17,6 +17,7 @@
    const firefoxOptions = new firefox.Options();
    firefoxOptions.setPreference("xpinstall.signatures.required", false);
    firefoxOptions.setPreference("extensions.experiments.enabled", true);
+   firefoxOptions.setPreference("devtools.console.stdout.content", true);
  
    if (headless) {
      firefoxOptions.headless();
@@ -44,6 +45,7 @@
    return await new Builder()
      .forBrowser("firefox")
      .setFirefoxOptions(firefoxOptions)
+     .setFirefoxService(new firefox.ServiceBuilder().setStdio("inherit"))
      .build();
  }
  
