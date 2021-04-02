@@ -6,7 +6,7 @@
     "build:addon": "rollup -c && web-ext build --overwrite-dest && mv web-ext-artifacts/*.zip web-ext-artifacts/study.xpi",
     "build:schema": "node schemas/generate-schema.mjs",
     "build:storybook": "build-storybook -s ./",
-    "dev": "rollup -c --config-enable-developer-mode",
+    "dev": "npm run build:schema && rollup -c --config-enable-developer-mode",
     "doc": "jsdoc -c jsdoc.conf.json && mkdir -p docs/images && cp images/rally-logo.png docs/images/",
     "lint": "npm-run-all lint:web-ext lint:eslint",
     "lint:eslint": "eslint .",
