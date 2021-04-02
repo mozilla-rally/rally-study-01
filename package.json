@@ -14,7 +14,7 @@
     "package": "npm run build && web-ext build --overwrite-dest --ignore-files \"./tests/**/*\" --ignore-files \"./src/**/*\" --ignore-files \"./rollup.config.js\"",
     "start": "npm run build && web-ext run",
     "test:unit": "jest",
-    "test:integration": "npm run package && mv web-ext-artifacts/*.zip web-ext-artifacts/study.xpi && mocha --timeout 30000 \"./tests/integration/*.js\"",
+    "test:integration": "npm run dev && web-ext build --overwrite-dest && mv web-ext-artifacts/*.zip web-ext-artifacts/study.xpi && mocha --timeout 30000 \"./tests/integration/*.js\" 2>&1 | tee integration.log",
     "watch": "npm-run-all --parallel watch:raw watch:bundled",
     "watch:raw": "npm run build:schema && npm run dev -- -w",
     "watch:bundled": "npm run build:schema && web-ext run --watch-file dist/background.js --watch-file dist/content-scripts/attention-collector.js --watch-file schemas/measurements.1.schema.json"
