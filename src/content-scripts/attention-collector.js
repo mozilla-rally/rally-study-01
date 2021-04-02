@@ -128,7 +128,7 @@
          * The title element contents of the page.
          * @type {string}
          */
-         let title = '';
+        let title = '';
 
         /**
          * The og:description element contents of the page.
@@ -141,6 +141,12 @@
          * @type {string}
          */
         let ogType = '';
+
+                /**
+         * The canonical url or og:url tags in the page's head.
+         * @type {string}
+         */
+        let canonicalOrOGURL = '';
 
         /** 
          * The start time (unix timestamp in ms) the attention event started.
@@ -192,6 +198,16 @@
             return getContentsHavingSelector('meta[property="og:type"]', documentElement);
         }
 
+        function getCanonicalURL(documentElement) {
+            const elem = documentElement.querySelector('link[rel="canonical"]');
+            if (elem === null) return undefined;
+            return elem.href;
+        }
+
+        function getOGURL(documentElement) {
+            return getContentsHavingSelector('meta[property="og:url"]', documentElement);
+        }
+
         /**
          * 
          * @param {*} documentElement 
@@ -216,6 +232,16 @@
             title = getTitle(document) || '';
             ogDescription = getOGDescription(document) || getMetaDescription(document) || '';
             ogType = getOGType(document) || '';
+            canonicalOrOGURL = getCanonicalURL(document) || getOGURL(document) || '';
+        }
+
+        function getOrigin(url) {
+            try {
+                return new URL(url).origin;
+            } catch {
+                return '';
+            }
+            
         }
 
         // COLLECTION-SENDING FUNCTIONS
@@ -228,8 +254,9 @@
             PageManager.sendMessage({ 
                 type: "RS01.attentionCollection",
                 pageId: PageManager.pageId,
-                url: PageManager.url,
-                referrer: PageManager.referrer,
+                canonicalOrOGURL,
+                origin: getOrigin(PageManager.url),
+                referrerOrigin: getOrigin(PageManager.referrer),
                 pageVisitStartTime: PageManager.pageVisitStartTime,
                 pageVisitStopTime: timestamp,
                 duration: attentionDuration,
@@ -255,8 +282,9 @@
             PageManager.sendMessage({ 
                 type: "RS01.audioCollection",
                 pageId: PageManager.pageId,
-                url: PageManager.url,
-                referrer: PageManager.referrer,
+                canonicalOrOGURL,
+                origin: getOrigin(PageManager.url),
+                referrerOrigin: getOrigin(PageManager.referrer),
                 pageVisitStartTime: PageManager.pageVisitStartTime,
                 pageVisitStopTime: timestamp,
                 duration: audioDuration,
