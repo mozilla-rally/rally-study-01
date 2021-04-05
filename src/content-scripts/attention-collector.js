@@ -1,7 +1,7 @@
 /**
  * Content script attention-collector for RS01.
  *
- * Responsible for thee collection of the `RS01.attentionEvent` and `RS01.audioEvent`, which is sent
+ * Responsible for the collection of the `RS01.attentionEvent` and `RS01.audioEvent`, which is sent
  * to attention-reporter.js.
  * 
  * This content script is organized as follows:
@@ -128,25 +128,25 @@
          * The title element contents of the page.
          * @type {string}
          */
-        let title = '';
+        let title = "";
 
         /**
          * The og:description element contents of the page.
          * @type {string}
          */
-        let ogDescription = '';
+        let ogDescription = "";
 
         /**
          * The og:type meta element.
          * @type {string}
          */
-        let ogType = '';
+        let ogType = "";
 
-                /**
+        /**
          * The canonical url or og:url tags in the page's head.
          * @type {string}
          */
-        let canonicalOrOGURL = '';
+        let canonicalOrOGURL = "";
 
         /** 
          * The start time (unix timestamp in ms) the attention event started.
@@ -186,7 +186,7 @@
          * @returns {string} the content of the title element
          */
         function getTitle(documentElement) {
-            return getContentsHavingSelector('title', documentElement);
+            return getContentsHavingSelector("title", documentElement);
         }
         
         /**
@@ -195,17 +195,26 @@
          * @returns {string} the content of the meta og:type tag
          */
         function getOGType(documentElement) {
-            return getContentsHavingSelector('meta[property="og:type"]', documentElement);
+            return getContentsHavingSelector("meta[property='og:type']", documentElement);
         }
 
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the href of the canonical url link element, if present
+         */
         function getCanonicalURL(documentElement) {
-            const elem = documentElement.querySelector('link[rel="canonical"]');
-            if (elem === null) return undefined;
-            return elem.href;
+            const elem = documentElement.querySelector("link[rel='canonical']");
+            return elem === null ? undefined : elem.href;
         }
 
+        /**
+         * 
+         * @param {*} documentElement 
+         * @returns {string} the contents of the og:url meta element, if present
+         */
         function getOGURL(documentElement) {
-            return getContentsHavingSelector('meta[property="og:url"]', documentElement);
+            return getContentsHavingSelector("meta[property='og:url']", documentElement);
         }
 
         /**
@@ -214,7 +223,7 @@
          * @returns {string} the content of the meta og:description tag
          */
         function getOGDescription(documentElement) {
-            return getContentsHavingSelector('meta[property="og:description"]', documentElement);
+            return getContentsHavingSelector("meta[property='og:description']", documentElement);
         }
 
         /**
@@ -223,23 +232,23 @@
          * @returns {string} the content of the meta description tag
          */
         function getMetaDescription(documentElement) {
-            return getContentsHavingSelector('meta[name="description"]', documentElement);
+            return getContentsHavingSelector("meta[name='description']", documentElement);
         }
         /**
          * Gather the measurements from the DOM.
          */
         function getDOMElements() {
-            title = getTitle(document) || '';
-            ogDescription = getOGDescription(document) || getMetaDescription(document) || '';
-            ogType = getOGType(document) || '';
-            canonicalOrOGURL = getCanonicalURL(document) || getOGURL(document) || '';
+            title = getTitle(document) || "";
+            ogDescription = getOGDescription(document) || getMetaDescription(document) || "";
+            ogType = getOGType(document) || "";
+            canonicalOrOGURL = getCanonicalURL(document) || getOGURL(document) || "";
         }
 
         function getOrigin(url) {
             try {
                 return new URL(url).origin;
             } catch {
-                return '';
+                return "";
             }
             
         }
@@ -351,11 +360,11 @@
                 audioStopTime = timeStamp;
                 // if the page had audio, it's time to send the audio data event.
                 if (PageManager.pageHasAudio) {
-                    sendAudioData(timeStamp, 'page-visit-stop');
+                    sendAudioData(timeStamp, "page-visit-stop");
                 } 
                 // always send an attention event regardless of whether an audio
                 // event is playing or not.
-                sendAttentionData(timeStamp, 'page-visit-stop');
+                sendAttentionData(timeStamp, "page-visit-stop");
             }
         }
 
