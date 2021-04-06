@@ -5,7 +5,7 @@ The schema for validating reported data is available [here](#FIXME).
 The `schema/` directory has two relevant components:
 
 1. a script that generates the final schema, [`generate-schema.mjs`](https://github.com/mozilla-rally/rally-study-01/blob/master/schemas/measurements.config.mjs). To generate the schema, run `npm run build:schema`.
-2. the last-generated schema, [`meaasurements.1.schema.json`](https://github.com/mozilla-rally/rally-study-01/blob/master/schemas/measurements.1.schema.json).
+2. the last-generated schema, [`measurements.1.schema.json`](https://github.com/mozilla-rally/rally-study-01/blob/master/schemas/measurements.1.schema.json).
 
 We've separated the schema construction from the output in case we change the structure and need to output a more complex schema.
 
