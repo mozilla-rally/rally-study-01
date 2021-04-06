@@ -44,8 +44,8 @@ For each RS01.event, we will collect:
 - `referrerOrigin`: The origin of the referrer URL for the page loading in the tab
 - `pageVisitStartTime`: Unix timestamp (in ms) of the page visit start
 - `pageVisitStopTime`: Unix timestamp (in ms) of the page visit end 
-- `eventStartTime`: Unix timestamp (in ms) noting when the event started. For an attention event, this field notes when a tab with a page loaded in it was activated. For an audio event, this field notes when an unmuted audio element began playing in the active tab.
-- `eventStopTime`: Unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab.
+- `eventStartTime`: Unix timestamp (in ms) noting when the event started. For an attention event, this field notes when an inactive tab with a page loaded in it has been given active focus or a new page loads in an already-active tab. For an audio event, this field notes when an unmuted audio element began playing in the active tab.
+- `eventStopTime`: Unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab which ends the current attention event. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab.
 - `duration`: Duration (in ms) that the event occurred
 - `eventTerminationReason`: The reason the user’s attention switched to the current attention event (e.g. changed a tab, loaded a new URL in the currently-active tab, closed a tab, closed a window, created a new tab, created a new window, stopped playing audio)
 - `title`: The contents of the title element in the head of the page

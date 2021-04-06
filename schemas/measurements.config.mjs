@@ -30,11 +30,11 @@ export const sharedEventProperties = {
       },
       "eventStartTime": { 
         "type": "integer", 
-        "description": "Unix timestamp (in ms) noting when the event started. For an attention event, this field notes when a tab with a page loaded in it was activated. For an audio event, this field notes when an unmuted audio element began playing in the active tab." 
+        "description": "Unix timestamp (in ms) noting when the event started. For an attention event, this field notes when a an inactive tab with a page loaded in it has been given active focus or a new page loads in an already-active tab. For an audio event, this field notes when an unmuted audio element began playing in the active tab." 
       },
       "eventStopTime": { 
         "type": "integer", 
-        "description": "Unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab." 
+        "description": "Unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab which ends the current attention event. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab." 
       },
       "eventTerminationReason": {
         "type": "string",
