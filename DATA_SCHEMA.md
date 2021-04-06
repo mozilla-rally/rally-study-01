@@ -18,7 +18,6 @@ This study sends one event, `RS01.event`. It captures two event types, `"attenti
 ```javascript
 {
   "pageId": "2e9109c1a64eb6615fa434f418ce6c77",
-  "canonicalOrOGURL": "",
   "origin": "https://www.wiktionary.org",
   "referrerOrigin": "https://www.wikipedia.org",
   "pageVisitStartTime": 1617135086813,
@@ -39,7 +38,7 @@ This study sends one event, `RS01.event`. It captures two event types, `"attenti
 
 For each `RS01.event`, we will collect:
 - `eventType`: the type of event recorded. Either `"attention"` or `"audio"`. An *attention* event is an instance where the user was actively using the browser in an active tab in an active window. An *audio* event tells us when an active browser tab has audio playing. We use this as a proxy for a user passively consuming audio and video. These two event types have near identical payloads, with a few exceptions noted below.
-- `canonicalOrOGURL`: the canonical URL as found in the page's head element (e.g. `<link rel='canonical' href='...' />`). If the canonical URL isn't present, looks for and uses the og:url tag contents. if neither are present, will be an empty string.
+- `pageId`: a unique ID associated with a page visit. Each page ID is 128-bit value, randomly generated with the Web Crypto API and stored as a hexadecimal `String`. While this representation is less efficient than a `Uint8Array` or similar, it is more convenient for development and debugging.
 - `origin`:  the origin of the URL associated with the page visit. Calculated by applying `new URL(url).origin`. See the documentation for [`url.origin`](https://developer.mozilla.org/en-US/docs/Web/API/URL/origin)
 - `referrerOrigin`: the origin of the referrer URL for the page loading in the tab
 - `pageVisitStartTime`: unix timestamp (in ms) of the page visit start

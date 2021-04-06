@@ -6,7 +6,7 @@ export const sharedEventProperties = {
     },
     "pageId": {
         "type": "string",
-        "description": "each page ID is 128-bit value, randomly generated with the Web Crypto API and stored as a hexadecimal `String`. While this representation is less efficient than a `Uint8Array` or similar, it is more convenient for development and debugging. The page ID is available in the content script environment."
+        "description": "a unique ID associated with a page visit. Each page ID is 128-bit value, randomly generated with the Web Crypto API and stored as a hexadecimal `String`. While this representation is less efficient than a `Uint8Array` or similar, it is more convenient for development and debugging."
       },
       "origin": {
         "type": "string",
