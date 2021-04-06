@@ -5,7 +5,7 @@ The schema for validating reported data is available [here](#FIXME).
 The `schema/` directory has two relevant components:
 
 1. a script that generates the final schema, `generate-schema.mjs`. To generate the schema, run `npm run build:schema`.
-2. the last-generated schema, `meaasurements.1.schema.json`.
+2. the last-generated schema, [`meaasurements.1.schema.json`](https://github.com/mozilla-rally/rally-study-01/blob/master/schemas/measurements.config.mjs).
 
 We've separated the schema construction from the output in case we change the structure and need to output a more complex schema.
 
@@ -37,7 +37,7 @@ This study sends one event, `RS01.event`. It captures two event types, `"attenti
 }
 ```
 
-For each RS01.event, we will collect:
+For each `RS01.event`, we will collect:
 - `eventType`: The type of event recorded. Either `"attention"` or `"audio"`. An *attention* event is an instance where the user was actively using the browser in an active tab in an active window. An *audio* event tells us when an active browser tab has audio playing. We use this as a proxy for a user passively consuming audio and video. These two event types have near identical payloads, with a few exceptions noted below.
 - `canonicalOrOGURL`: The canonical URL as found in the page's head element (e.g. `<link rel='canonical' href='...' />`). If the canonical URL isn't present, looks for and uses the og:url tag contents. if neither are present, will be an empty string.
 - `origin`:  the origin of the URL associated with the page visit. Calculated by applying `new URL(url).origin`. See the documentation for [`url.origin`](https://developer.mozilla.org/en-US/docs/Web/API/URL/origin)
