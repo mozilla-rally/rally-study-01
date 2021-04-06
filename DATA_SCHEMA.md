@@ -2,7 +2,7 @@
 
 The schema for validating reported data is available [here](#FIXME).
 
-the `schema/` directory has two relevant components:
+The `schema/` directory has two relevant components:
 
 1. a script that generates the final schema, `generate-schema.mjs`. To generate the schema, run `npm run build:schema`.
 2. the last-generated schema, `meaasurements.1.schema.json`.
