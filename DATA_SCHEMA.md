@@ -38,17 +38,17 @@ This study sends one event, `RS01.event`. It captures two event types, `"attenti
 ```
 
 For each `RS01.event`, we will collect:
-- `eventType`: The type of event recorded. Either `"attention"` or `"audio"`. An *attention* event is an instance where the user was actively using the browser in an active tab in an active window. An *audio* event tells us when an active browser tab has audio playing. We use this as a proxy for a user passively consuming audio and video. These two event types have near identical payloads, with a few exceptions noted below.
-- `canonicalOrOGURL`: The canonical URL as found in the page's head element (e.g. `<link rel='canonical' href='...' />`). If the canonical URL isn't present, looks for and uses the og:url tag contents. if neither are present, will be an empty string.
+- `eventType`: the type of event recorded. Either `"attention"` or `"audio"`. An *attention* event is an instance where the user was actively using the browser in an active tab in an active window. An *audio* event tells us when an active browser tab has audio playing. We use this as a proxy for a user passively consuming audio and video. These two event types have near identical payloads, with a few exceptions noted below.
+- `canonicalOrOGURL`: the canonical URL as found in the page's head element (e.g. `<link rel='canonical' href='...' />`). If the canonical URL isn't present, looks for and uses the og:url tag contents. if neither are present, will be an empty string.
 - `origin`:  the origin of the URL associated with the page visit. Calculated by applying `new URL(url).origin`. See the documentation for [`url.origin`](https://developer.mozilla.org/en-US/docs/Web/API/URL/origin)
-- `referrerOrigin`: The origin of the referrer URL for the page loading in the tab
-- `pageVisitStartTime`: Unix timestamp (in ms) of the page visit start
-- `pageVisitStopTime`: Unix timestamp (in ms) of the page visit end 
-- `eventStartTime`: Unix timestamp (in ms) noting when the event started. For an attention event, this field notes when an inactive tab with a page loaded in it has been given active focus or a new page loads in an already-active tab. For an audio event, this field notes when an unmuted audio element began playing in the active tab.
-- `eventStopTime`: Unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab which ends the current attention event. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab.
-- `duration`: Duration (in ms) that the event occurred
-- `eventTerminationReason`: The reason the user’s attention switched to the current attention event (e.g. changed a tab, loaded a new URL in the currently-active tab, closed a tab, closed a window, created a new tab, created a new window, stopped playing audio)
-- `title`: The contents of the title element in the head of the page
+- `referrerOrigin`: the origin of the referrer URL for the page loading in the tab
+- `pageVisitStartTime`: unix timestamp (in ms) of the page visit start
+- `pageVisitStopTime`: unix timestamp (in ms) of the page visit end 
+- `eventStartTime`: unix timestamp (in ms) noting when the event started. For an attention event, this field notes when an inactive tab with a page loaded in it has been given active focus or a new page loads in an already-active tab. For an audio event, this field notes when an unmuted audio element began playing in the active tab.
+- `eventStopTime`: unix timestamp (in ms) noting when the event ended. For an attention event, this field notes when a user closed the active tab, switched or closed the active window, or loaded a new page into the active tab which ends the current attention event. For an audio event, this field notes when an unmuted audio element stopped playing in the active tab.
+- `duration`: duration (in ms) that the event occurred
+- `eventTerminationReason`: the reason the user’s attention switched to the current attention event (e.g. changed a tab, loaded a new URL in the currently-active tab, closed a tab, closed a window, created a new tab, created a new window, stopped playing audio)
+- `title`: the contents of the title element in the head of the page
 - `ogType`: the `og:type` meta tag contents (e.g. `<meta type="og:type" contents="article" />`)
 - `description`: the `og:description` meta tag contents (e.g. `<meta type="og:description" contents="..." />`). If this isn't supplied, then attempts to look at the meta description contents (e.g. `<meta name="description" content="...">`)
 
