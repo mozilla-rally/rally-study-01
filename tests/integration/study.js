@@ -30,7 +30,7 @@ async function findAndAct(driver, element, action) {
 describe("Study Template integration test example", function () {
   // eslint-disable-next-line mocha/no-hooks-for-single-case
   beforeEach(async function () {
-    this.driver = await utils.getFirefoxDriver(true);
+    this.driver = await utils.getFirefoxDriver(false);
     await this.driver.installAddon("web-ext-artifacts/study.xpi");
     await this.driver.setContext(firefox.Context.CONTENT);
   });
@@ -43,10 +43,19 @@ describe("Study Template integration test example", function () {
   it("successfully opens the study template options page on installation", async function () {
     await this.driver.get("https://wikipedia.org");
 
-   // Let's wait until the page is fully loaded and the title matches. 
+    // Let's wait until the page is fully loaded and the title matches.
     await this.driver.wait(
       until.titleIs("Wikipedia"),
       WAIT_FOR_PROPERTY
     );
+
+    await this.driver.get("https://youtube.com");
+
+    // Let's wait until the page is fully loaded and the title matches.
+    await this.driver.wait(
+      until.titleIs("YouTube"),
+      WAIT_FOR_PROPERTY
+    );
+
   });
 });
