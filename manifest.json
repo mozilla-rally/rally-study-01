@@ -1,8 +1,8 @@
 {
-  "description": "FIXME: copy must be added here https://github.com/mozilla-rally/rally-study-01/issues/62",
+  "description": "\"Your Time Online and 'Doomscrolling'\" is a study Web Extension by Mozilla Rally. This is a research project conducted as part of the Mozilla Rally program. Mozilla Rally is an opt-in program where you voluntarily contribute your browsing data to research studies. In order to participate in this study, you must first install the Mozilla Rally Web Extension, which you can find at rally.mozilla.org.  You also must accept the Mozilla Rally policy terms before you can enroll in any research studies. To get started, simply visit rally.mozilla.org.",
   "author": "Mozilla Rally",
   "manifest_version": 2,
-  "name": "Rally Study 01",
+  "name": "Your Time Online and \"Doomscrolling\"",
   "version": "0.1.0",
   "homepage_url": "https://github.com/mozilla-rally/rally-study-01",
 
