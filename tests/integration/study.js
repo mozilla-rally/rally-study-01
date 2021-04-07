@@ -5,6 +5,8 @@
 const utils = require("./utils.js");
 const { By, until } = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
+const lineReader = require('line-reader');
+
 
 // The number of milliseconds to wait for some
 // property to change in tests. This should be
@@ -57,5 +59,10 @@ describe("Study Template integration test example", function () {
       WAIT_FOR_PROPERTY
     );
 
+    lineReader.eachLine("integration.log", (line) => {
+      if (line.includes("RS01")) {
+        console.log("test123", line);
+      }
+    });
   });
 });
