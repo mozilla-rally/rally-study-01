@@ -22,7 +22,7 @@ export default async function runStudy(devMode) {
     const rally = new Rally();
     try {
       await rally.initialize(
-        "moz-fx-data-rally-zero-one",
+        "zero-one",
         {
           "crv": "P-256",
           "kid": "zero-one",
