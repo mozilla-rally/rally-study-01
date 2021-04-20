@@ -22,7 +22,9 @@ export default async function runStudy(devMode) {
     const rally = new Rally();
     try {
       await rally.initialize(
-        "zero-one",
+        // the schema namespace provided by Mozilla
+        "rally-zero-one",
+        // the public jwk token provided by Mozilla
         {
           "crv": "P-256",
           "kid": "zero-one",
