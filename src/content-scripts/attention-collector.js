@@ -301,6 +301,8 @@
                     
                     scrollHeight = document.documentElement.scrollHeight;
 
+                    // We accidentally let the schema type for this be `integer` so 
+                    // we will have to truncate, since on occasion this reports a float.
                     maxPixelScrollDepth =
                         Math.trunc(
                             Math.min(scrollHeight,
