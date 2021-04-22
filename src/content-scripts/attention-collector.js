@@ -302,9 +302,12 @@
                     scrollHeight = document.documentElement.scrollHeight;
 
                     maxPixelScrollDepth =
-                        Math.min(scrollHeight,
-                            Math.max(maxPixelScrollDepth, window.scrollY + document.documentElement.clientHeight)
-                        );
+                        Math.trunc(
+                            Math.min(scrollHeight,
+                                Math.max(maxPixelScrollDepth, window.scrollY + document.documentElement.clientHeight)
+                        )
+                    );
+                        
                     maxRelativeScrollDepth = Math.min(
                         Math.max(maxRelativeScrollDepth, (window.scrollY + document.documentElement.clientHeight) / scrollHeight),
                         1);
