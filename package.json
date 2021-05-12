@@ -47,7 +47,7 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
-    "@mozilla/glean": "^0.10.2",
+    "@mozilla/glean": "^0.12.0",
     "@mozilla/rally": "0.6.0",
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
