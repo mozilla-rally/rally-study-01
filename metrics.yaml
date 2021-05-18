@@ -117,7 +117,7 @@ page:
       - hulmer@mozilla.com
     expires: never
 
-page.audio:
+page.attention:
   max_relative_scroll_depth:
     type: quantity
     unit: percentage

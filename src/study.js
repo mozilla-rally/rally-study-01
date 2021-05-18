@@ -7,7 +7,7 @@ import { onPageData, stopMeasurement } from "./attention-reporter";
 import * as pageMetrics from "../src/generated/page.js";
 import * as pageVisitMetrics from "../src/generated/pageVisit.js";
 import * as eventMetrics from "../src/generated/event.js";
-import * as pageAudioMetrics from "../src/generated/pageAudio.js";
+import * as pageAttentionMetrics from "../src/generated/pageAttention.js";
 import * as rs01Pings from "../src/generated/pings.js";
 
 function collectEventDataAndSubmit(rally, devMode) {
@@ -33,10 +33,10 @@ function collectEventDataAndSubmit(rally, devMode) {
     pageMetrics.ogType.set(data.ogType);
     pageMetrics.ogDescription.set(data.description);
 
-    if (data.eventType === "audio") {
-      pageAudioMetrics.maxRelativeScrollDepth.set(data.maxRelativeScrollDepth);
-      pageAudioMetrics.maxPixelScrollDepth.set(data.maxPixelScrollDepth);
-      pageAudioMetrics.scrollHeight.set(data.scrollHeight);
+    if (data.eventType === "attention") {
+      pageAttentionMetrics.maxRelativeScrollDepth.set(data.maxRelativeScrollDepth);
+      pageAttentionMetrics.maxPixelScrollDepth.set(data.maxPixelScrollDepth);
+      pageAttentionMetrics.scrollHeight.set(data.scrollHeight);
     }
 
     rs01Pings.rs01Event.submit(data.eventType);
