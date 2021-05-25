@@ -33,6 +33,16 @@
       "tsx",
       "node"
     ],
+    "moduleNameMapper": {
+      "^@mozilla/glean/webext$": "<rootDir>/node_modules/@mozilla/glean/dist/webext/index/webext.js",
+      "^@mozilla/glean/webext/plugins/encryption$": "<rootDir>/node_modules/@mozilla/glean/dist/webext/plugins/encryption.js",
+      "^@mozilla/glean/webext/private/metrics/(.*)$": "<rootDir>/node_modules/@mozilla/glean/dist/webext/core/metrics/types/$1.js",
+      "^@mozilla/glean/webext/private/ping$": "<rootDir>/node_modules/@mozilla/glean/dist/webext/core/pings/ping_type.js",
+      "^jose/jwe/compact/encrypt$": "<rootDir>/node_modules/jose/dist/node/cjs/jwe/compact/encrypt.js",
+      "^jose/jwk/parse": "<rootDir>/node_modules/jose/dist/node/cjs/jwk/parse.js",
+      "^jose/jwk/thumbprint": "<rootDir>/node_modules/jose/dist/node/cjs/jwk/thumbprint.js"
+    },
+    "testEnvironment": "./tests/jest-custom-environment.js",
     "transform": {
       ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
       "^.+\\.js$": "babel-jest"
