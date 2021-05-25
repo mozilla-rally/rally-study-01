@@ -2,7 +2,7 @@
   "name": "rally-study-01",
   "version": "0.1.5",
   "scripts": {
-    "build": "npm run build:schema && rollup -c",
+    "build": "npm run build:schema && npm run build:addon",
     "build:addon": "npm run build:glean && rollup -c && web-ext build --overwrite-dest",
     "build:glean": "npm run build:glean:metrics && npm run build:glean:docs",
     "build:glean:metrics": "glean translate ./metrics.yaml ./pings.yaml -f javascript -o src/generated",
