@@ -83,7 +83,7 @@ export default async function runStudy(devMode) {
 
       // If we got to this poin, then Rally is properly
       // initialized and we can flip collection on.
-      Glean.initialize("rally-zero-one", true, {
+      Glean.initialize("rally-study-zero-one", true, {
         debug: { logPings: true },
         plugins: [
           new PingEncryptionPlugin({
