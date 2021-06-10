@@ -28,7 +28,7 @@ rally:
     data_reviews:
       - https://github.com/mozilla-rally/rally-core-addon/pull/505#issuecomment-815826426
     notification_emails:
-      - than@mozilla.com
+      - hulmer@mozilla.com
     expires: never
 
 page:
