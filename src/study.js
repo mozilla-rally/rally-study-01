@@ -8,10 +8,19 @@ import * as pageMetrics from "../src/generated/page.js";
 import * as pageVisitMetrics from "../src/generated/pageVisit.js";
 import * as eventMetrics from "../src/generated/event.js";
 import * as pageAttentionMetrics from "../src/generated/pageAttention.js";
+import * as rallyManagementMetrics from "../src/generated/rally.js";
 import * as rs01Pings from "../src/generated/pings.js";
+
+function setRallyID(rally, devMode) {
+  const rallyID = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyID;
+  if (rallyID) {
+    rallyManagementMetrics.id.set(rallyID);
+  }
+}
 
 function collectEventDataAndSubmit(rally, devMode) {
   // note: onPageData calls startMeasurement.
+  setRallyID(rally, devMode);
   onPageData.addListener(async (data) => {
     if (devMode) {
       console.debug("RS01.event", data);
