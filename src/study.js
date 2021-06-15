@@ -20,7 +20,6 @@ function setRallyID(rally, devMode) {
 
 function collectEventDataAndSubmit(rally, devMode) {
   // note: onPageData calls startMeasurement.
-  setRallyID(rally, devMode);
   onPageData.addListener(async (data) => {
     if (devMode) {
       console.debug("RS01.event", data);
@@ -89,6 +88,7 @@ export default async function runStudy(devMode) {
             Glean.setUploadEnabled(false);
           }
       });
+      setRallyID(rally, devMode);
 
       // If we got to this poin, then Rally is properly
       // initialized and we can flip collection on.
