@@ -88,7 +88,6 @@ export default async function runStudy(devMode) {
         console.error("Rally ID not acquired by study.");
       }
       studyEnrollmentMetrics.id.set(uid);
-      studyEnrollmentMetrics.enrolledOn.set(new Date());
       rs01Pings.studyEnrollment.submit();
 
       // If we got to this point, then Rally is properly
