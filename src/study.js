@@ -8,6 +8,7 @@ import * as pageMetrics from "../src/generated/page.js";
 import * as pageVisitMetrics from "../src/generated/pageVisit.js";
 import * as eventMetrics from "../src/generated/event.js";
 import * as pageAttentionMetrics from "../src/generated/pageAttention.js";
+import * as studyEnrollmentMetrics from "../src/generated/studyEnrollment.js";
 import * as rs01Pings from "../src/generated/pings.js";
 
 function collectEventDataAndSubmit(rally, devMode) {
@@ -80,8 +81,17 @@ export default async function runStudy(devMode) {
             Glean.setUploadEnabled(false);
           }
       });
+      
+      // send the study enrollment ping to the secure analysis environment.
+      const uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyID;
+      if (!devMode && !uid) {
+        console.error("Rally ID not acquired by study.");
+      }
+      studyEnrollmentMetrics.id.set(uid);
+      studyEnrollmentMetrics.enrolledOn.set(new Date());
+      rs01Pings.studyManagement.submit("study_enrollment");
 
-      // If we got to this poin, then Rally is properly
+      // If we got to this point, then Rally is properly
       // initialized and we can flip collection on.
       Glean.initialize("rally-study-zero-one", true, {
         debug: { logPings: true },
