@@ -77,21 +77,18 @@ In addition to those built-in metrics, the following metrics are added to the pi
 
 ## study-enrollment
 
-A ping representing the study enrollment event.
+This ping is sent when the user has consented to the study.
 
+
+This ping is sent if empty.
 
 **Data reviews for this ping:**
 
-- <forthcoming>
+- <https://bugzilla.mozilla.org/show_bug.cgi?id=1663857#c5>
 
 **Bugs related to this ping:**
 
-- <https://github.com/mozilla-rally/rally-study-01/issues/114>
-
-**Reasons this ping may be sent:**
-
-- `enrollment`: The user has enrolled in this study.
-
+- <https://github.com/mozilla-rally/rally-core-addon/issues/117>
 
 All Glean pings contain built-in metrics in the [`ping_info`](https://mozilla.github.io/glean/book/user/pings/index.html#the-ping_info-section) and [`client_info`](https://mozilla.github.io/glean/book/user/pings/index.html#the-client_info-section) sections.
 

@@ -11,18 +11,15 @@ $schema: moz://mozilla.org/schemas/glean/pings/2-0-0
 
 study-enrollment:
   description: |
-    A ping representing the study enrollment event.
+    This ping is sent when the user has consented to the study.
   include_client_id: false
-  send_if_empty: false
+  send_if_empty: true
   bugs:
     - https://github.com/mozilla-rally/rally-study-01/issues/114
   data_reviews:
     - forthcoming
   notification_emails:
     - hulmer@mozilla.com
-  reasons:
-    enrollment: |
-      The user has enrolled in this study.
 
 
 rs01-event:
