@@ -89,7 +89,7 @@ export default async function runStudy(devMode) {
       }
       studyEnrollmentMetrics.id.set(uid);
       studyEnrollmentMetrics.enrolledOn.set(new Date());
-      rs01Pings.studyManagement.submit("study_enrollment");
+      rs01Pings.studyEnrollment.submit("enrollment");
 
       // If we got to this point, then Rally is properly
       // initialized and we can flip collection on.
