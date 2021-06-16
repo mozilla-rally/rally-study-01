@@ -8,6 +8,7 @@ import * as pageMetrics from "../src/generated/page.js";
 import * as pageVisitMetrics from "../src/generated/pageVisit.js";
 import * as eventMetrics from "../src/generated/event.js";
 import * as pageAttentionMetrics from "../src/generated/pageAttention.js";
+import * as rallyManagementMetrics from "../src/generated/rally.js";
 import * as rs01Pings from "../src/generated/pings.js";
 
 function collectEventDataAndSubmit(rally, devMode) {
@@ -95,6 +96,13 @@ export default async function runStudy(devMode) {
           })
         ]
       });
+      let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyID;
+      if (!devMode && !uid) {
+        console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
+        uid = "11111111-1111-1111-1111-111111111111";
+      }
+      rallyManagementMetrics.id.set(uid);
+      rs01Pings.studyEnrollment.submit();
     } catch (err) {
       throw new Error(err);
     }
