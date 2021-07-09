@@ -13,11 +13,10 @@ study-enrollment:
   description: |
     This ping is sent when the user has consented to the study.
   include_client_id: false
-  send_if_empty: true
   bugs:
     - https://github.com/mozilla-rally/rally-study-01/issues/114
   data_reviews:
-    - https://github.com/mozilla-rally/rally-core-addon/pull/505#issuecomment-815826426
+    - https://bugzilla.mozilla.org/show_bug.cgi?id=1663857#c5
   notification_emails:
     - hulmer@mozilla.com
 

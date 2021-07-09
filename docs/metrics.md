@@ -80,11 +80,9 @@ In addition to those built-in metrics, the following metrics are added to the pi
 This ping is sent when the user has consented to the study.
 
 
-This ping is sent if empty.
-
 **Data reviews for this ping:**
 
-- <https://github.com/mozilla-rally/rally-core-addon/pull/505#issuecomment-815826426>
+- <https://bugzilla.mozilla.org/show_bug.cgi?id=1663857#c5>
 
 **Bugs related to this ping:**
 
