@@ -21,5 +21,26 @@
       "dist/browser-polyfill.js",
       "dist/background.js"
     ]
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/browser-polyfill.js",
+        "/dist/content-scripts/attention-collector.js"
+      ]
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "dist/browser-polyfill.js",
+        "/WebScience/Utilities/content-scripts/pageManager.js"
+      ]
+    }
+  ]
 }
