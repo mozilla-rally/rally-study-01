@@ -446,9 +446,6 @@ export async function initialize() {
             pageHasAudio: changeInfo.audible,
             timeStamp
         });
-    }, {
-        urls: [ "http://*/*", "https://*/*" ],
-        properties: [ "audible" ]
     });
 
     // If a tab's URL changed because of the History API, send WebScience.Utilities.PageManager.urlChanged
