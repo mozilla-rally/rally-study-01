@@ -107,12 +107,6 @@ function removeListener(listener) {
 }
 
 /**
- * The registered page navigation content script.
- * @private
- * @type {RegisteredContentScript|null}
- */
-let registeredContentScript = null;
-/**
  * Whether to notify the page data listener about private windows.
  * @private
  */
@@ -155,14 +149,6 @@ export async function startMeasurement({
 
     notifyAboutPrivateWindows = privateWindows;
 
-    registeredContentScript = await browser.contentScripts.register({
-        matches: matchPatterns,
-        js: [{
-            file: "/dist/content-scripts/attention-collector.js"
-        }],
-        runAt: "document_start"
-    });
-
     // Event properties that both of these event types consume.
     const sharedEventProperties = {
         pageId: "string",
@@ -202,14 +188,12 @@ export async function startMeasurement({
 }
 
 /**
- * This function will stop the attention measurement. It unregisters the 
+ * This function will stop the attention measurement. It unregisters the
  * content script and all associated listeners.
  */
 export async function stopMeasurement() {
-    Messaging.unregisterListener("RS01.attentionCollection", pageDataListener);    
-    Messaging.unregisterListener("RS01.audioCollection", pageDataListener);    
-    registeredContentScript.unregister();
-    registeredContentScript = null;
+    Messaging.unregisterListener("RS01.attentionCollection", pageDataListener);
+    Messaging.unregisterListener("RS01.audioCollection", pageDataListener);
     notifyAboutPrivateWindows = false;
 }
 

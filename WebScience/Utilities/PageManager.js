@@ -629,15 +629,6 @@ export async function initialize() {
         }
     }
 
-    // Register the PageManager content script for all HTTP(S) URLs
-    browser.contentScripts.register({
-        matches: [ "http://*/*", "https://*/*" ],
-        js: [{
-            file: "/WebScience/Utilities/content-scripts/pageManager.js"
-        }],
-        runAt: "document_start"
-    });
-
     initializing = false;
     initialized = true;
 }
