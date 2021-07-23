@@ -5,23 +5,21 @@
   "name": "Your Time Online and \"Doomscrolling\"",
   "version": "0.3.0",
   "homepage_url": "https://github.com/mozilla-rally/rally-study-01",
-
   "icons": {
     "16": "images/study-icon.png",
     "32": "images/study-icon.png",
     "64": "images/study-icon.png"
   },
-
-  "applications": {
-    "gecko": {
-      "id": "rally-study-01@mozilla.org",
-      "strict_min_version": "77.0a1"
-    }
-  },
-
-  "permissions": ["tabs", "idle", "<all_urls>", "webNavigation", "storage"],
-
+  "permissions": [
+    "tabs",
+    "idle",
+    "<all_urls>",
+    "webNavigation"
+  ],
   "background": {
-    "scripts": ["dist/background.js"]
+    "scripts": [
+      "dist/browser-polyfill.js",
+      "dist/background.js"
+    ]
   }
 }
