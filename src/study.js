@@ -41,12 +41,6 @@ function collectEventDataAndSubmit(rally, devMode) {
     }
 
     rs01Pings.rs01Event.submit(data.eventType);
-
-    // though we collect the data as two different event types using Web Science,
-    // we send the payload using one schema, "RS01.event".
-    // Once https://github.com/mozilla-rally/web-science/issues/33 is resolved,
-    // we will change the collection schema (but keep this pipeline schema the same).
-    rally.sendPing("measurements", data);
   }, {
       matchPatterns: ["<all_urls>"],
       privateWindows: false
