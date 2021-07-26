@@ -14,7 +14,8 @@
     "tabs",
     "idle",
     "<all_urls>",
-    "webNavigation"
+    "webNavigation",
+    "storage"
   ],
   "background": {
     "scripts": [
