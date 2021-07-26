@@ -42,66 +42,51 @@ function collectEventDataAndSubmit(rally, devMode) {
 
     rs01Pings.rs01Event.submit(data.eventType);
   }, {
-      matchPatterns: ["<all_urls>"],
-      privateWindows: false
+    matchPatterns: ["<all_urls>"],
+    privateWindows: false
   });
 }
 
 export default async function runStudy(devMode) {
-    const rally = new Rally();
-    try {
-      await rally.initialize(
-        // the schema namespace provided by Mozilla
-        "rally-zero-one",
-        // the public jwk token provided by Mozilla
-        {
-          "crv": "P-256",
-          "kid": "zero-one",
-          "kty": "EC",
-          "x": "edhPpqhgK9dD7NaqhQ7Ckw9sU6b39X7XB8HnA366Rjs",
-          "y": "GzsfM19n-iH-DVR0iKEoA8BE2CFF46wR__siJ3SdiNs"
-        },          
-      devMode,
-      (newState) => {
-          if (newState === runStates.RUNNING) {
-            // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
-            console.debug("~~~ RS01 running ~~~");
-            Glean.setUploadEnabled(true);
-            collectEventDataAndSubmit(rally, devMode);
-          } else {
-            console.debug("~~~ RS01 not running ~~~");
-            // stop the measurement here.
-            stopMeasurement();
-            Glean.setUploadEnabled(false);
-          }
-      });
-
-      // If we got to this poin, then Rally is properly
-      // initialized and we can flip collection on.
-      Glean.initialize("rally-study-zero-one", true, {
-        debug: { logPings: true },
-        plugins: [
-          new PingEncryptionPlugin({
-            "crv": "P-256",
-            "kid": "rally-study-zero-one",
-            "kty": "EC",
-            "x": "-a1Ths2-TNF5jon3MlfQXov5lGA4YX98aYsQLc3Rskg",
-            "y": "Cf8PIvq_CV46r_DBdvAc0d6aN1WeWAWKfiMtwkpNGqw"
-          })
-        ]
-      });
-      let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyId;
-      if (!devMode && !uid) {
-        console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
-        uid = "11111111-1111-1111-1111-111111111111";
+  const rally = new Rally(
+    devMode,
+    (newState) => {
+      if (newState === runStates.RUNNING) {
+        // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
+        console.debug("~~~ RS01 running ~~~");
+        Glean.setUploadEnabled(true);
+        collectEventDataAndSubmit(rally, devMode);
+      } else {
+        console.debug("~~~ RS01 not running ~~~");
+        // stop the measurement here.
+        stopMeasurement();
+        Glean.setUploadEnabled(false);
       }
-      rallyManagementMetrics.id.set(uid);
-      rs01Pings.studyEnrollment.submit();
-    } catch (err) {
-      throw new Error(err);
-    }
-    // if initialization worked, commence data collection.
-    console.debug("~~~ RS01 running ~~~");
-    collectEventDataAndSubmit(rally, devMode);
-    return rally;
+    });
+
+  // If we got to this poin, then Rally is properly
+  // initialized and we can flip collection on.
+  Glean.initialize("rally-study-zero-one", true, {
+    debug: { logPings: true },
+    plugins: [
+      new PingEncryptionPlugin({
+        "crv": "P-256",
+        "kid": "rally-study-zero-one",
+        "kty": "EC",
+        "x": "-a1Ths2-TNF5jon3MlfQXov5lGA4YX98aYsQLc3Rskg",
+        "y": "Cf8PIvq_CV46r_DBdvAc0d6aN1WeWAWKfiMtwkpNGqw"
+      })
+    ]
+  });
+  let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyId;
+  if (!devMode && !uid) {
+    console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
+    uid = "11111111-1111-1111-1111-111111111111";
+  }
+  rallyManagementMetrics.id.set(uid);
+  rs01Pings.studyEnrollment.submit();
+  // if initialization worked, commence data collection.
+  console.debug("~~~ RS01 running ~~~");
+  collectEventDataAndSubmit(rally, devMode);
+  return rally;
 }
