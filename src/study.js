@@ -48,26 +48,32 @@ function collectEventDataAndSubmit(rally, devMode) {
 }
 
 export default async function runStudy(devMode) {
-  console.debug("rhelmer debug devMode:", devMode);
-  const rally = new Rally(
-    devMode,
-    (newState) => {
-      if (newState === runStates.RUNNING) {
+  const rallyStateChange = (newState) => {
+    switch (newState) {
+      case runStates.RUNNING:
         // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
         console.debug("~~~ RS01 running ~~~");
         Glean.setUploadEnabled(true);
         collectEventDataAndSubmit(rally, devMode);
-      } else {
+        break;
+      case runStates.PAUSED:
         console.debug("~~~ RS01 not running ~~~");
         // stop the measurement here.
         stopMeasurement();
         Glean.setUploadEnabled(false);
-      }
-    });
+        break;
+    }
+  }
+
+  const rally = new Rally(
+    devMode,
+    (newState) => rallyStateChange);
+
+  const uploadEnabled = !devMode;
 
   // If we got to this point, then Rally is properly
   // initialized and we can flip collection on.
-  Glean.initialize("rally-study-zero-one", true, {
+  Glean.initialize("rally-study-zero-one", uploadEnabled, {
     debug: { logPings: true },
     plugins: [
       new PingEncryptionPlugin({
@@ -79,15 +85,26 @@ export default async function runStudy(devMode) {
       })
     ]
   });
-  let uid = devMode ? "00000000-0000-0000-0000-000000000000" : await rally.rallyId();
-  if (!devMode && !uid) {
-    console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
-    uid = "11111111-1111-1111-1111-111111111111";
+
+  let rallyId;
+  if (devMode) {
+    rallyId = "00000000-0000-0000-0000-000000000000";
+  } else {
+    rallyId = await rally.rallyId();
+    if (!rallyId) {
+      console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
+      rallyId = "11111111-1111-1111-1111-111111111111";
+    }
+
+    // Send these regardless of the current study state.
+    rallyManagementMetrics.id.set(rallyId);
+    rs01Pings.studyEnrollment.submit();
   }
-  rallyManagementMetrics.id.set(uid);
-  rs01Pings.studyEnrollment.submit();
-  // if initialization worked, commence data collection.
-  console.debug("~~~ RS01 running ~~~");
-  collectEventDataAndSubmit(rally, devMode);
+
+  // if initialization worked, and the study is not paused, commence data collection.
+  // FIXME in the future, this state will be changed internally by rally.js
+  rally._state = runStates.RUNNING;
+  rallyStateChange(rally._state);
+
   return rally;
 }
