@@ -48,6 +48,7 @@ function collectEventDataAndSubmit(rally, devMode) {
 }
 
 export default async function runStudy(devMode) {
+  console.debug("rhelmer debug devMode:", devMode);
   const rally = new Rally(
     devMode,
     (newState) => {
@@ -64,7 +65,7 @@ export default async function runStudy(devMode) {
       }
     });
 
-  // If we got to this poin, then Rally is properly
+  // If we got to this point, then Rally is properly
   // initialized and we can flip collection on.
   Glean.initialize("rally-study-zero-one", true, {
     debug: { logPings: true },
