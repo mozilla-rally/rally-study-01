@@ -65,9 +65,7 @@ export default async function runStudy(devMode) {
     }
   }
 
-  const rally = new Rally(
-    devMode,
-    (newState) => rallyStateChange);
+  const rally = new Rally(devMode, rallyStateChange);
 
   const uploadEnabled = !devMode;
 
@@ -103,8 +101,7 @@ export default async function runStudy(devMode) {
 
   // if initialization worked, and the study is not paused, commence data collection.
   // FIXME in the future, this state will be changed internally by rally.js
-  rally._state = runStates.RUNNING;
-  rallyStateChange(rally._state);
+  rally._resume();
 
   return rally;
 }
