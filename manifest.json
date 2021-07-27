@@ -43,5 +43,10 @@
         "/WebScience/Utilities/content-scripts/pageManager.js"
       ]
     }
-  ]
+  ],
+  "externally_connectable": {
+    "matches": [
+      "*://rally-web-spike.web.app/*"
+    ]
+  }
 }
