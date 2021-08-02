@@ -99,9 +99,5 @@ export default async function runStudy(devMode) {
     rs01Pings.studyEnrollment.submit();
   }
 
-  // if initialization worked, and the study is not paused, commence data collection.
-  // FIXME in the future, this state will be changed internally by rally.js
-  rally._resume();
-
   return rally;
 }
