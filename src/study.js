@@ -88,15 +88,23 @@ export default async function runStudy(devMode) {
   if (devMode) {
     rallyId = "00000000-0000-0000-0000-000000000000";
   } else {
-    rallyId = await rally.rallyId();
+    rallyId = rally.rallyId;
     if (!rallyId) {
       console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
       rallyId = "11111111-1111-1111-1111-111111111111";
     }
 
-    // Send these regardless of the current study state.
     rallyManagementMetrics.id.set(rallyId);
-    rs01Pings.studyEnrollment.submit();
+
+    // Send study enrollment regardless of the current study state.
+    // TODO this could be moved to the server-side
+    const studyEnrolled = browser.storage.local.get("studyErolled");
+    if (studyEnrolled !== true) {
+      rs01Pings.studyEnrollment.submit();
+      browser.storage.local.set({
+        studyEnrolled: true
+      })
+    }
   }
 
   return rally;
