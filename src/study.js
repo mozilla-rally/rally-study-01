@@ -71,12 +71,12 @@ export default async function runStudy(devMode) {
 
   // If we got to this point, then Rally is properly
   // initialized and we can flip collection on.
-  Glean.initialize("rally-study-zero-one", uploadEnabled, {
+  Glean.initialize("rally-study-zero-one-rwp-test", uploadEnabled, {
     debug: { logPings: true },
     plugins: [
       new PingEncryptionPlugin({
         "crv": "P-256",
-        "kid": "rally-study-zero-one",
+        "kid": "rally-study-zero-one-rwp-test",
         "kty": "EC",
         "x": "-a1Ths2-TNF5jon3MlfQXov5lGA4YX98aYsQLc3Rskg",
         "y": "Cf8PIvq_CV46r_DBdvAc0d6aN1WeWAWKfiMtwkpNGqw"
@@ -88,20 +88,24 @@ export default async function runStudy(devMode) {
   if (devMode) {
     rallyId = "00000000-0000-0000-0000-000000000000";
   } else {
-    rallyId = await rally.rallyId();
+    rallyId = rally.rallyId;
     if (!rallyId) {
       console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
       rallyId = "11111111-1111-1111-1111-111111111111";
     }
 
-    // Send these regardless of the current study state.
     rallyManagementMetrics.id.set(rallyId);
-    rs01Pings.studyEnrollment.submit();
-  }
 
-  // if initialization worked, and the study is not paused, commence data collection.
-  // FIXME in the future, this state will be changed internally by rally.js
-  rally._resume();
+    // Send one-time study enrollment ping.
+    // TODO this could be moved to the server-side.
+    const studyEnrolled = !!browser.storage.local.get("studyEnrolled");
+    if (studyEnrolled !== true) {
+      rs01Pings.studyEnrollment.submit();
+      browser.storage.local.set({
+        studyEnrolled: true
+      })
+    }
+  }
 
   return rally;
 }
