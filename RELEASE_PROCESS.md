@@ -12,7 +12,7 @@ Before pushing the PR, ensure that building an unsigned XPI works and that it in
 
 ```bash
 npm install
-npm run build:addon
+npm run package
 ```
 
 The output will be in `./web-ext-artifacts`.
