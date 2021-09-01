@@ -50,22 +50,46 @@ function collectEventDataAndSubmit(rally, devMode) {
 export default async function runStudy(devMode) {
   const rallyStateChange = (newState) => {
     switch (newState) {
-      case runStates.RUNNING:
+      case runStates.RUNNING: {
         // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
         console.debug("~~~ RS01 running ~~~");
+
+        const rallyId = rally.rallyId;
+        rallyManagementMetrics.id.set(rallyId);
+
+        // Send one-time study enrollment ping.
+        // TODO this could be moved to the server-side.
+        const studyEnrolled = browser.storage.local.get("studyEnrolled");
+        if (studyEnrolled !== true) {
+          rs01Pings.studyEnrollment.submit();
+          browser.storage.local.set({
+            studyEnrolled: true
+          })
+        }
         Glean.setUploadEnabled(true);
         collectEventDataAndSubmit(rally, devMode);
         break;
-      case runStates.PAUSED:
+      }
+      case runStates.PAUSED: {
         console.debug("~~~ RS01 not running ~~~");
         // stop the measurement here.
         stopMeasurement();
         Glean.setUploadEnabled(false);
         break;
+      }
+      case runStates.ENDED: {
+        console.debug("~~~ RS01 not running ~~~");
+        // stop the measurement here.
+        stopMeasurement();
+        Glean.setUploadEnabled(false);
+        break;
+      }
+      default:
+        throw new Error(`Unknown Rally state: ${newState}`);
     }
   }
 
-  const rally = new Rally(devMode, rallyStateChange);
+  const rally = new Rally(devMode, rallyStateChange, "http://localhost:3000", "exampleStudy1");
 
   const uploadEnabled = !devMode;
 
@@ -83,29 +107,6 @@ export default async function runStudy(devMode) {
       })
     ]
   });
-
-  let rallyId;
-  if (devMode) {
-    rallyId = "00000000-0000-0000-0000-000000000000";
-  } else {
-    rallyId = rally.rallyId;
-    if (!rallyId) {
-      console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
-      rallyId = "11111111-1111-1111-1111-111111111111";
-    }
-
-    rallyManagementMetrics.id.set(rallyId);
-
-    // Send one-time study enrollment ping.
-    // TODO this could be moved to the server-side.
-    const studyEnrolled = !!browser.storage.local.get("studyEnrolled");
-    if (studyEnrolled !== true) {
-      rs01Pings.studyEnrollment.submit();
-      browser.storage.local.set({
-        studyEnrolled: true
-      })
-    }
-  }
 
   return rally;
 }
