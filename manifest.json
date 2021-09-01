@@ -38,14 +38,9 @@
       ],
       "js": [
         "dist/browser-polyfill.js",
-        "/WebScience/Utilities/content-scripts/pageManager.js"
+        "/WebScience/Utilities/content-scripts/pageManager.js",
+        "dist/rally-content.js"
       ]
     }
-  ],
-  "externally_connectable": {
-    "matches": [
-      "*://rally-web-spike.web.app/*",
-      "*://localhost/*"
-    ]
-  }
+  ]
 }
