@@ -29,17 +29,16 @@
       ],
       "js": [
         "dist/browser-polyfill.js",
+        "/WebScience/Utilities/content-scripts/pageManager.js",
         "/dist/content-scripts/attention-collector.js"
       ]
     },
     {
       "matches": [
-        "<all_urls>"
+        "https:///rally-web-spike.web.app/*"
       ],
       "js": [
-        "dist/browser-polyfill.js",
-        "/WebScience/Utilities/content-scripts/pageManager.js",
-        "dist/rally-content.js"
+        "dist/content-scripts/rally-content.js"
       ]
     }
   ]
