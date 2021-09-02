@@ -89,7 +89,11 @@ export default async function runStudy(devMode) {
     }
   }
 
-  const rally = new Rally(devMode, rallyStateChange, "https://rally-web-spike.web.app/", "rally-study-01");
+  let rallySite = "https://rally-web-spike.web.app";
+  if (devMode) {
+    rallySite = "http://localhost:3000";
+  }
+  const rally = new Rally(devMode, rallyStateChange, rallySite, "rally-study-01");
 
   const uploadEnabled = !devMode;
 
