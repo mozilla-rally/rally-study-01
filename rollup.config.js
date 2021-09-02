@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import commonjs from "@rollup/plugin-commonjs";
+import copy from "rollup-plugin-copy";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 
@@ -38,6 +39,24 @@ export default (cliArgs) => [
         preferBuiltins: false,
       }),
       commonjs(),
+      copy({
+        targets: [{
+          src: [
+            "node_modules/@mozilla/rally/dist/rally-content.js",
+          ],
+          dest: "dist/content-scripts/",
+        }],
+        flatten: true,
+      }),
+      copy({
+        targets: [{
+          src: [
+            "node_modules/webextension-polyfill/dist/browser-polyfill.js",
+          ],
+          dest: "dist/",
+        }],
+        flatten: true,
+      }),
     ],
   },
   {
