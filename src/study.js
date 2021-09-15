@@ -93,7 +93,37 @@ export default async function runStudy(devMode) {
   if (devMode) {
     rallySite = "http://localhost:3000";
   }
-  const rally = new Rally(devMode, rallyStateChange, rallySite, "rally-study-01");
+
+  // The Rally Study ID.
+  let studyId = "rally-study-01";
+  if (devMode) {
+    studyId = "exampleStudy1";
+  }
+
+  // The Firebase config.
+  let firebaseConfig = {
+    "apiKey": "AIzaSyAJv0aTJMCbG_e6FJZzc6hSzri9qDCmvoo",
+    "authDomain": "rally-web-spike.firebaseapp.com",
+    "projectId": "rally-web-spike",
+    "storageBucket": "rally-web-spike.appspot.com",
+    "messagingSenderId": "85993993890",
+    "appId": "1:85993993890:web:b975ff99733d2d8b50c9fb",
+    "functionsHost": "https://us-central1-rally-web-spike.cloudfunctions.net"
+  }
+
+  if (devMode) {
+    firebaseConfig = {
+      "apiKey": "abc123",
+      "authDomain": "demo-rally.firebaseapp.com",
+      "projectId": "demo-rally",
+      "storageBucket": "demo-rally.appspot.com",
+      "messagingSenderId": "abc123",
+      "appId": "1:123:web:abc123",
+      "functionsHost": "http://localhost:5001"
+    }
+  }
+
+  const rally = new Rally(devMode, rallyStateChange, rallySite, studyId, firebaseConfig);
 
   const uploadEnabled = !devMode;
 

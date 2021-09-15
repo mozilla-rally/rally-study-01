@@ -58,7 +58,7 @@
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
     "@mozilla/glean": "^0.15.0",
-    "@mozilla/rally": "github:mozilla-rally/rally-sdk#d16a00014e4fe84fc0e2a8feb66043da59e0c5e8",
+    "@mozilla/rally": "github:mozilla-rally/rally-sdk#b3bb288106f3fe66619fae92c9608e6fca6f5e70",
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
     "@rollup/plugin-replace": "^2.4.1",
