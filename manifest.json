@@ -11,10 +11,13 @@
     "64": "images/study-icon.png"
   },
   "permissions": [
+    "<all_urls>",
     "tabs",
     "idle",
     "webNavigation",
-    "storage"
+    "webRequest",
+    "storage",
+    "unlimitedStorage"
   ],
   "background": {
     "scripts": [
@@ -35,7 +38,7 @@
     },
     {
       "matches": [
-        "https:///rally-web-spike.web.app/*"
+        "https://rally-web-spike.web.app/*"
       ],
       "js": [
         "dist/content-scripts/rally-content.js"
