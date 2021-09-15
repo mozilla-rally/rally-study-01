@@ -66,7 +66,6 @@ export default async function runStudy(devMode) {
             studyEnrolled: true
           })
         }
-        Glean.setUploadEnabled(true);
         collectEventDataAndSubmit(rally, devMode);
         break;
       }
@@ -74,14 +73,12 @@ export default async function runStudy(devMode) {
         console.debug("~~~ RS01 not running ~~~");
         // stop the measurement here.
         stopMeasurement();
-        Glean.setUploadEnabled(false);
         break;
       }
       case runStates.ENDED: {
         console.debug("~~~ RS01 not running ~~~");
         // stop the measurement here.
         stopMeasurement();
-        Glean.setUploadEnabled(false);
         break;
       }
       default:
