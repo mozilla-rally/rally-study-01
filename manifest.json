@@ -3,25 +3,46 @@
   "author": "Mozilla Rally",
   "manifest_version": 2,
   "name": "Your Time Online and \"Doomscrolling\"",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage_url": "https://github.com/mozilla-rally/rally-study-01",
-
   "icons": {
     "16": "images/study-icon.png",
     "32": "images/study-icon.png",
     "64": "images/study-icon.png"
   },
-
-  "applications": {
-    "gecko": {
-      "id": "rally-study-01@mozilla.org",
-      "strict_min_version": "77.0a1"
-    }
-  },
-
-  "permissions": ["tabs", "idle", "<all_urls>", "webNavigation", "storage"],
-
+  "permissions": [
+    "<all_urls>",
+    "tabs",
+    "idle",
+    "webNavigation",
+    "webRequest",
+    "storage",
+    "unlimitedStorage"
+  ],
   "background": {
-    "scripts": ["dist/background.js"]
-  }
+    "scripts": [
+      "dist/browser-polyfill.js",
+      "dist/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/browser-polyfill.js",
+        "/WebScience/Utilities/content-scripts/pageManager.js",
+        "/dist/content-scripts/attention-collector.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://rally-web-spike.web.app/*"
+      ],
+      "js": [
+        "dist/content-scripts/rally-content.js"
+      ]
+    }
+  ]
 }
