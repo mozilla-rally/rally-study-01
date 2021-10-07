@@ -21,13 +21,12 @@ npm install
 # run developer mode.
 # this will run web-ext and listen for all input files, 
 # and will rebuild and auto-reload for you.
-npm run dev
+npm run watch
 
-# build the addon and output the xpi so that it can be loaded in Firefox (via `about:debugging`)
-# or Chrome (`chrome://extensions`, enable developer mode).
-# See the "running this study to collect your own data"
+# build the addon and output the xpi so that it can be side-loaded in Firefox Nightly.
+# See the "running thiis study to collect your own data" 
 # section below for further instructions.
-npm run package
+npm run build:addon
 
 # --- Other commands you might be interested in ---
 # generate documentation for all modules in the doc/ directory.

@@ -222,14 +222,8 @@ export function sendMessageToTab(tabId, message) {
         debugLog(`Attempted to send message that fails validation: ${JSON.stringify(message)}`);
         return new Promise((resolve) => { resolve(false); });
     }
-    return browser.tabs.sendMessage(tabId, message).catch(async (reason) => {
-        const tab = await browser.tabs.get(tabId);
-        // It's normal not to be able to catch messages from chrome: URLs, extensions cannot inspect these.
-        // NOTE: there are other protected URLs such as the Chrome Web Store, which are too numerous and unpredictable to list here.
-        // If they are logging "Could not establish connection. Receiving end does not exist." then this is likely why.
-        if (!(tab.url.startsWith("chrome:"))) {
-            debugLog(`Unable to send message to tab: ${JSON.stringify(reason, message)}`);
-        }
+    return browser.tabs.sendMessage(tabId, message).catch((reason) => {
+        debugLog(`Unable to send message to tab: ${JSON.stringify(message)}`);
         return false;
     });
 }

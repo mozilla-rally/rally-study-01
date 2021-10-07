@@ -41,107 +41,73 @@ function collectEventDataAndSubmit(rally, devMode) {
     }
 
     rs01Pings.rs01Event.submit(data.eventType);
+
+    // though we collect the data as two different event types using Web Science,
+    // we send the payload using one schema, "RS01.event".
+    // Once https://github.com/mozilla-rally/web-science/issues/33 is resolved,
+    // we will change the collection schema (but keep this pipeline schema the same).
+    rally.sendPing("measurements", data);
   }, {
-    matchPatterns: ["<all_urls>"],
-    privateWindows: false
+      matchPatterns: ["<all_urls>"],
+      privateWindows: false
   });
 }
 
 export default async function runStudy(devMode) {
-  const rallyStateChange = (newState) => {
-    switch (newState) {
-      case runStates.RUNNING: {
-        // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
-        console.debug("~~~ RS01 running ~~~");
+    const rally = new Rally();
+    try {
+      await rally.initialize(
+        // the schema namespace provided by Mozilla
+        "rally-zero-one",
+        // the public jwk token provided by Mozilla
+        {
+          "crv": "P-256",
+          "kid": "zero-one",
+          "kty": "EC",
+          "x": "edhPpqhgK9dD7NaqhQ7Ckw9sU6b39X7XB8HnA366Rjs",
+          "y": "GzsfM19n-iH-DVR0iKEoA8BE2CFF46wR__siJ3SdiNs"
+        },          
+      devMode,
+      (newState) => {
+          if (newState === runStates.RUNNING) {
+            // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
+            console.debug("~~~ RS01 running ~~~");
+            Glean.setUploadEnabled(true);
+            collectEventDataAndSubmit(rally, devMode);
+          } else {
+            console.debug("~~~ RS01 not running ~~~");
+            // stop the measurement here.
+            stopMeasurement();
+            Glean.setUploadEnabled(false);
+          }
+      });
 
-        const rallyId = rally.rallyId;
-        rallyManagementMetrics.id.set(rallyId);
-
-        // Send one-time study enrollment ping.
-        // TODO this could be moved to the server-side.
-        const studyEnrolled = browser.storage.local.get("studyEnrolled");
-        if (studyEnrolled !== true) {
-          rs01Pings.studyEnrollment.submit();
-          browser.storage.local.set({
-            studyEnrolled: true
+      // If we got to this poin, then Rally is properly
+      // initialized and we can flip collection on.
+      Glean.initialize("rally-study-zero-one", true, {
+        debug: { logPings: true },
+        plugins: [
+          new PingEncryptionPlugin({
+            "crv": "P-256",
+            "kid": "rally-study-zero-one",
+            "kty": "EC",
+            "x": "-a1Ths2-TNF5jon3MlfQXov5lGA4YX98aYsQLc3Rskg",
+            "y": "Cf8PIvq_CV46r_DBdvAc0d6aN1WeWAWKfiMtwkpNGqw"
           })
-        }
-        collectEventDataAndSubmit(rally, devMode);
-        break;
+        ]
+      });
+      let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyId;
+      if (!devMode && !uid) {
+        console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
+        uid = "11111111-1111-1111-1111-111111111111";
       }
-      case runStates.PAUSED: {
-        console.debug("~~~ RS01 not running ~~~");
-        // stop the measurement here.
-        stopMeasurement();
-        break;
-      }
-      case runStates.ENDED: {
-        console.debug("~~~ RS01 not running ~~~");
-        // stop the measurement here.
-        stopMeasurement();
-        Glean.setUploadEnabled(false);
-        browser.storage.local.set({
-          studyEnrolled: false
-        })
-        break;
-      }
-      default:
-        throw new Error(`Unknown Rally state: ${newState}`);
+      rallyManagementMetrics.id.set(uid);
+      rs01Pings.studyEnrollment.submit();
+    } catch (err) {
+      throw new Error(err);
     }
-  }
-
-  let rallySite = "https://rally-web-spike.web.app";
-  if (devMode) {
-    rallySite = "http://localhost:3000";
-  }
-
-  // The Rally Study ID.
-  let studyId = "rally-study-01";
-  if (devMode) {
-    studyId = "exampleStudy1";
-  }
-
-  // The Firebase config.
-  let firebaseConfig = {
-    "apiKey": "AIzaSyAJv0aTJMCbG_e6FJZzc6hSzri9qDCmvoo",
-    "authDomain": "rally-web-spike.firebaseapp.com",
-    "projectId": "rally-web-spike",
-    "storageBucket": "rally-web-spike.appspot.com",
-    "messagingSenderId": "85993993890",
-    "appId": "1:85993993890:web:b975ff99733d2d8b50c9fb",
-    "functionsHost": "https://us-central1-rally-web-spike.cloudfunctions.net"
-  }
-
-  if (devMode) {
-    firebaseConfig = {
-      "apiKey": "abc123",
-      "authDomain": "demo-rally.firebaseapp.com",
-      "projectId": "demo-rally",
-      "storageBucket": "demo-rally.appspot.com",
-      "messagingSenderId": "abc123",
-      "appId": "1:123:web:abc123",
-      "functionsHost": "http://localhost:5001"
-    }
-  }
-
-  const rally = new Rally(devMode, rallyStateChange, rallySite, studyId, firebaseConfig);
-
-  const uploadEnabled = !devMode;
-
-  // If we got to this point, then Rally is properly
-  // initialized and we can flip collection on.
-  Glean.initialize("rally-study-zero-one-rwp-test", uploadEnabled, {
-    debug: { logPings: true },
-    plugins: [
-      new PingEncryptionPlugin({
-        "crv": "P-256",
-        "kid": "rally-study-zero-one-rwp-test",
-        "kty": "EC",
-        "x": "-a1Ths2-TNF5jon3MlfQXov5lGA4YX98aYsQLc3Rskg",
-        "y": "Cf8PIvq_CV46r_DBdvAc0d6aN1WeWAWKfiMtwkpNGqw"
-      })
-    ]
-  });
-
-  return rally;
+    // if initialization worked, commence data collection.
+    console.debug("~~~ RS01 running ~~~");
+    collectEventDataAndSubmit(rally, devMode);
+    return rally;
 }
