@@ -68,21 +68,29 @@ export default async function runStudy(devMode) {
           "y": "GzsfM19n-iH-DVR0iKEoA8BE2CFF46wR__siJ3SdiNs"
         },          
       devMode,
-      (newState) => {
+      async (newState) => {
           if (newState === runStates.RUNNING) {
             // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
             console.debug("~~~ RS01 running ~~~");
             Glean.setUploadEnabled(true);
             collectEventDataAndSubmit(rally, devMode);
+
+            let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyId;
+            if (!devMode && !uid) {
+              console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
+              uid = "11111111-1111-1111-1111-111111111111";
+            }
+            rallyManagementMetrics.id.set(uid);
+            rs01Pings.studyEnrollment.submit();
           } else {
             console.debug("~~~ RS01 not running ~~~");
+            await browser.storage.local.set({ "studyPaused": true });
             // stop the measurement here.
             stopMeasurement();
-            Glean.setUploadEnabled(false);
           }
       });
 
-      // If we got to this poin, then Rally is properly
+      // If we got to this point, then Rally is properly
       // initialized and we can flip collection on.
       Glean.initialize("rally-study-zero-one", true, {
         debug: { logPings: true },
@@ -96,18 +104,16 @@ export default async function runStudy(devMode) {
           })
         ]
       });
-      let uid = devMode ? "00000000-0000-0000-0000-000000000000" : rally._rallyId;
-      if (!devMode && !uid) {
-        console.error("Rally ID not acquired by study. Defaulting to the default value of 11111111-1111-1111-1111-111111111111.");
-        uid = "11111111-1111-1111-1111-111111111111";
-      }
-      rallyManagementMetrics.id.set(uid);
-      rs01Pings.studyEnrollment.submit();
     } catch (err) {
       throw new Error(err);
     }
-    // if initialization worked, commence data collection.
-    console.debug("~~~ RS01 running ~~~");
-    collectEventDataAndSubmit(rally, devMode);
+
+    if (rally._state === runStates.RUNNING) {
+      // if initialization worked, commence data collection.
+      console.debug("~~~ RS01 running ~~~");
+      collectEventDataAndSubmit(rally, devMode);
+    } else {
+      console.debug("~~~ RS01 not running ~~~");
+    }
     return rally;
 }
