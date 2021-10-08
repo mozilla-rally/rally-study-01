@@ -1,6 +1,6 @@
 {
   "name": "rally-study-01",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "build": "npm run build:schema && npm run build:addon",
     "build:addon": "npm run build:glean && rollup -c && web-ext build --overwrite-dest",

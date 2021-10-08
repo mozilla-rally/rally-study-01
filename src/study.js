@@ -71,7 +71,7 @@ export default async function runStudy(devMode) {
           "y": "GzsfM19n-iH-DVR0iKEoA8BE2CFF46wR__siJ3SdiNs"
         },          
       devMode,
-      async (newState) => {
+      (newState) => {
           if (newState === runStates.RUNNING) {
             // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
             console.debug("~~~ RS01 running ~~~");
@@ -87,7 +87,6 @@ export default async function runStudy(devMode) {
             rs01Pings.studyEnrollment.submit();
           } else {
             console.debug("~~~ RS01 not running ~~~");
-            await browser.storage.local.set({ "studyPaused": true });
             // stop the measurement here.
             stopMeasurement();
           }
