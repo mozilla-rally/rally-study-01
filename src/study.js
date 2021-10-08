@@ -11,6 +11,9 @@ import * as pageAttentionMetrics from "../src/generated/pageAttention.js";
 import * as rallyManagementMetrics from "../src/generated/rally.js";
 import * as rs01Pings from "../src/generated/pings.js";
 
+// TODO fill in correct study end notice URL.
+const STUDY_END_NOTICE_URL="https://example.com";
+
 function collectEventDataAndSubmit(rally, devMode) {
   // note: onPageData calls startMeasurement.
   onPageData.addListener(async (data) => {
@@ -115,5 +118,18 @@ export default async function runStudy(devMode) {
     } else {
       console.debug("~~~ RS01 not running ~~~");
     }
+
+    try {
+      const result = await browser.storage.local.get("endNoticeServed");
+      if (!("endNoticeServed" in result) || result["endNoticeServed"] === false) {
+        await browser.tabs.create({ url: STUDY_END_NOTICE_URL});
+        await browser.storage.local.set({ endNoticeServed: true });
+      } else {
+        console.debug("Not serving ending notice, already served:", result);
+      }
+    } catch (err) {
+      console.error("Unable to open tab, re-try next startup:", err);
+    }
+
     return rally;
 }
