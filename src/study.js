@@ -111,14 +111,6 @@ export default async function runStudy(devMode) {
       throw new Error(err);
     }
 
-    if (rally._state === runStates.RUNNING) {
-      // if initialization worked, commence data collection.
-      console.debug("~~~ RS01 running ~~~");
-      collectEventDataAndSubmit(rally, devMode);
-    } else {
-      console.debug("~~~ RS01 not running ~~~");
-    }
-
     try {
       const result = await browser.storage.local.get("endNoticeServed");
       if (!("endNoticeServed" in result) || result["endNoticeServed"] === false) {
