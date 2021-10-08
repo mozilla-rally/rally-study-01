@@ -1,7 +1,7 @@
 import Glean from "@mozilla/glean/webext";
 import PingEncryptionPlugin from "@mozilla/glean/webext/plugins/encryption";
 
-import { Rally, runStates } from "@mozilla/rally";
+import { Rally } from "@mozilla/rally";
 import { onPageData, stopMeasurement } from "./attention-reporter";
 
 import * as pageMetrics from "../src/generated/page.js";
@@ -72,7 +72,7 @@ export default async function runStudy(devMode) {
         },          
       devMode,
       (newState) => {
-          if (newState === runStates.RUNNING) {
+          if (newState === "resume") {
             // if the study is running but wasn't previously, let's re-initiate the onPageData listener.
             console.debug("~~~ RS01 running ~~~");
             Glean.setUploadEnabled(true);

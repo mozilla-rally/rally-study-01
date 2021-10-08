@@ -39,11 +39,14 @@ describe(suiteName, function() {
         expect(study._initialized).toBe(true);
     })
     it("successfully calls AttentionReporter.onPageData on initialization", async function() {
-        await runStudy(true);
+        const study = await runStudy(true)
+        study._state = "paused";
+        study._resume();
         expect(AttentionReporter.onPageData.addListener.mock.calls.length).toBe(1);
     })
     it("calls stopMeasurement if the rally instance receives a \"pause\" message", async function() {
         const study = await runStudy(true)
+        study._state = "running";
         study._pause();
         expect(AttentionReporter.stopMeasurement.mock.calls.length).toBe(1);
     })
