@@ -12,7 +12,7 @@ import * as rallyManagementMetrics from "../src/generated/rally.js";
 import * as rs01Pings from "../src/generated/pings.js";
 
 // TODO fill in correct study end notice URL.
-const STUDY_END_NOTICE_URL="https://example.com";
+const STUDY_END_NOTICE_URL="https://rally.mozilla.org/past-studies/your-time-online-and-doomscrolling-ending/";
 
 function collectEventDataAndSubmit(rally, devMode) {
   // note: onPageData calls startMeasurement.
