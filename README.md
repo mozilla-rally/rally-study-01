@@ -1,6 +1,8 @@
-# Rally Study 01 (RS01)
+# Rally Study 01 (RS01) [DECOMMISSIONED]
 
-_status: in development_
+_status: decommissioned_
+
+NB: see branch `0.4.0` for latest working version
 
 An exploratory study on what sites people use and how long they use them.
 
